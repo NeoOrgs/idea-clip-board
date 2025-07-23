@@ -52,6 +52,12 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Pinterest-inspired custom colors
+				'pinterest-red': 'hsl(var(--pinterest-red))',
+				'pinterest-red-hover': 'hsl(var(--pinterest-red-hover))',
+				'soft-gray': 'hsl(var(--soft-gray))',
+				'medium-gray': 'hsl(var(--medium-gray))',
+				'text-light': 'hsl(var(--text-light))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -67,6 +73,13 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'card': 'var(--shadow-card)',
+			},
+			transitionTimingFunction: {
+				'smooth': 'var(--transition-smooth)',
 			},
 			keyframes: {
 				'accordion-down': {
