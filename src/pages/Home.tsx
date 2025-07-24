@@ -19,6 +19,7 @@ interface Pin {
   profiles?: {
     full_name?: string;
     email: string;
+    avatar_url?: string;
   };
 }
 
@@ -63,16 +64,32 @@ const Home = () => {
       query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
+    const { data: pinsData, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching pins:', error);
-    } else {
-      // Map to include empty profiles for now
-      setPins((data || []).map(pin => ({
+      setLoading(false);
+      return;
+    }
+
+    // Fetch profiles for pins
+    if (pinsData && pinsData.length > 0) {
+      const userIds = [...new Set(pinsData.map(pin => pin.user_id))];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, email, avatar_url')
+        .in('user_id', userIds);
+
+      const profilesMap = new Map(profilesData?.map(profile => [profile.user_id, profile]) || []);
+      
+      const pinsWithProfiles = pinsData.map(pin => ({
         ...pin,
-        profiles: undefined
-      })));
+        profiles: profilesMap.get(pin.user_id)
+      }));
+
+      setPins(pinsWithProfiles);
+    } else {
+      setPins([]);
     }
     
     setLoading(false);
