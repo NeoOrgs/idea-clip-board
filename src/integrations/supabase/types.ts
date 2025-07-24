@@ -226,6 +226,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_type: string
+          pin_id: string
+          search_query: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_type: string
+          pin_id: string
+          search_query?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          pin_id?: string
+          search_query?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_count: number | null
+          last_updated: string
+          preferred_keywords: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_count?: number | null
+          last_updated?: string
+          preferred_keywords?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_count?: number | null
+          last_updated?: string
+          preferred_keywords?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
