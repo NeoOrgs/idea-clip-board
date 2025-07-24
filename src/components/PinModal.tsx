@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Share, MoreVertical, Download } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Heart, MessageCircle, Share, MoreVertical, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import SavePinDialog from "./SavePinDialog";
-import { useUserInteractions } from "@/hooks/useUserInteractions";
-import { downloadImage } from "@/utils/imageUtils";
 
 interface Pin {
   id: string;
@@ -24,7 +21,6 @@ interface Pin {
   profiles?: {
     full_name?: string;
     email: string;
-    avatar_url?: string;
   };
 }
 
@@ -32,11 +28,9 @@ interface Comment {
   id: string;
   content: string;
   created_at: string;
-  user_id: string;
   profiles?: {
     full_name?: string;
     email: string;
-    avatar_url?: string;
   };
 }
 
@@ -53,25 +47,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
   const [likesCount, setLikesCount] = useState(0);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const { logInteraction } = useUserInteractions();
-
-  const handleDownload = async () => {
-    const success = await downloadImage(pin.image_url, `${pin.title.replace(/[^a-zA-Z0-9]/g, '_')}`);
-    if (success) {
-      toast({
-        title: "Success",
-        description: "Image downloaded successfully",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to download image",
-        variant: "destructive",
-      });
-    }
-  };
 
   useEffect(() => {
     if (pin && isOpen) {
@@ -84,35 +60,18 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
   const fetchComments = async () => {
     if (!pin) return;
 
-    const { data: commentsData, error } = await supabase
+    const { data, error } = await supabase
       .from('comments')
       .select('*')
       .eq('pin_id', pin.id)
       .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching comments:', error);
-      return;
-    }
-
-    // Fetch profiles for each comment
-    if (commentsData && commentsData.length > 0) {
-      const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, email, avatar_url')
-        .in('user_id', userIds);
-
-      const profilesMap = new Map(profilesData?.map(profile => [profile.user_id, profile]) || []);
-      
-      const commentsWithProfiles = commentsData.map(comment => ({
+    if (!error) {
+      // Map comments with empty profiles for now
+      setComments((data || []).map(comment => ({
         ...comment,
-        profiles: profilesMap.get(comment.user_id)
-      }));
-
-      setComments(commentsWithProfiles);
-    } else {
-      setComments([]);
+        profiles: undefined
+      })));
     }
   };
 
@@ -169,8 +128,6 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
       if (!error) {
         setIsLiked(true);
         setLikesCount(prev => prev + 1);
-        // Log like interaction
-        logInteraction({ pinId: pin.id, type: 'like' });
       }
     }
   };
@@ -247,14 +204,6 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   <Button variant="ghost" size="sm" className="rounded-full p-2">
                     <MessageCircle className="h-5 w-5" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="rounded-full p-2"
-                    onClick={handleDownload}
-                  >
-                    <Download className="h-5 w-5" />
-                  </Button>
                   <Button variant="ghost" size="sm" className="rounded-full p-2">
                     <Share className="h-5 w-5" />
                   </Button>
@@ -270,19 +219,12 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                 )}
 
                 <div className="flex items-center space-x-2">
-                  <Avatar 
-                    className="h-8 w-8 cursor-pointer"
-                    onClick={() => navigate(`/user/${pin.user_id}`)}
-                  >
-                    <AvatarImage src={pin.profiles?.avatar_url} />
+                  <Avatar className="h-8 w-8">
                     <AvatarFallback>
-                      {(pin.profiles?.full_name || pin.profiles?.email || 'U').charAt(0).toUpperCase()}
+                      <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <span 
-                    className="text-sm font-medium cursor-pointer hover:underline"
-                    onClick={() => navigate(`/user/${pin.user_id}`)}
-                  >
+                  <span className="text-sm font-medium">
                     {pin.profiles?.full_name || pin.profiles?.email || 'Anonymous'}
                   </span>
                 </div>
@@ -296,21 +238,14 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   {comments.map((comment) => (
                     <Card key={comment.id} className="p-3">
                       <div className="flex items-start space-x-2">
-                        <Avatar 
-                          className="h-6 w-6 cursor-pointer"
-                          onClick={() => navigate(`/user/${comment.user_id}`)}
-                        >
-                          <AvatarImage src={comment.profiles?.avatar_url} />
+                        <Avatar className="h-6 w-6">
                           <AvatarFallback>
-                            {(comment.profiles?.full_name || comment.profiles?.email || 'U').charAt(0).toUpperCase()}
+                            <User className="h-3 w-3" />
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
-                            <span 
-                              className="text-sm font-medium cursor-pointer hover:underline"
-                              onClick={() => navigate(`/user/${comment.user_id}`)}
-                            >
+                            <span className="text-sm font-medium">
                               {comment.profiles?.full_name || comment.profiles?.email || 'Anonymous'}
                             </span>
                             <span className="text-xs text-muted-foreground">

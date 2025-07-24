@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { usePersonalizedFeed } from "@/hooks/usePersonalizedFeed";
-import { useUserInteractions } from "@/hooks/useUserInteractions";
 
 interface Pin {
   id: string;
@@ -21,7 +19,6 @@ interface Pin {
   profiles?: {
     full_name?: string;
     email: string;
-    avatar_url?: string;
   };
 }
 
@@ -33,8 +30,6 @@ const Home = () => {
   const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { personalizedPins, loading: personalizedLoading } = usePersonalizedFeed();
-  const { logSearch } = useUserInteractions();
 
   useEffect(() => {
     // Set up auth state listener
@@ -53,9 +48,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery) {
-      fetchPins();
-    }
+    fetchPins();
   }, [searchQuery]);
 
   const fetchPins = async () => {
@@ -70,42 +63,16 @@ const Home = () => {
       query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
     }
 
-    const { data: pinsData, error } = await query.order('created_at', { ascending: false });
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching pins:', error);
-      setLoading(false);
-      return;
-    }
-
-    // Fetch profiles for pins
-    if (pinsData && pinsData.length > 0) {
-      const userIds = [...new Set(pinsData.map(pin => pin.user_id))];
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('user_id, full_name, email, avatar_url')
-        .in('user_id', userIds);
-
-      const profilesMap = new Map(profilesData?.map(profile => [profile.user_id, profile]) || []);
-      
-      const pinsWithProfiles = pinsData.map(pin => ({
-        ...pin,
-        profiles: profilesMap.get(pin.user_id)
-      }));
-
-      setPins(pinsWithProfiles);
-      
-      // Log search interaction
-      if (searchQuery) {
-        logSearch(searchQuery, pinsWithProfiles.map(pin => pin.id));
-      }
     } else {
-      setPins([]);
-      
-      // Log search interaction with empty results
-      if (searchQuery) {
-        logSearch(searchQuery, []);
-      }
+      // Map to include empty profiles for now
+      setPins((data || []).map(pin => ({
+        ...pin,
+        profiles: undefined
+      })));
     }
     
     setLoading(false);
@@ -182,23 +149,8 @@ const Home = () => {
               <p className="text-muted-foreground">Loading pins...</p>
             </div>
           </div>
-        ) : searchQuery ? (
-          <PinGrid pins={pins} onPinClick={handlePinClick} />
-        ) : personalizedLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading personalized feed...</p>
-            </div>
-          </div>
         ) : (
-          <div>
-            <div className="container mx-auto px-4 mb-6">
-              <h2 className="text-xl font-semibold">Your personalized feed</h2>
-              <p className="text-muted-foreground">Based on your interactions and preferences</p>
-            </div>
-            <PinGrid pins={personalizedPins} onPinClick={handlePinClick} />
-          </div>
+          <PinGrid pins={pins} />
         )}
       </main>
     </div>
