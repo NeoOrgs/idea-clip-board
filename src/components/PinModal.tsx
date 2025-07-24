@@ -62,18 +62,16 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
 
     const { data, error } = await supabase
       .from('comments')
-      .select(`
-        *,
-        profiles!comments_user_id_fkey (
-          full_name,
-          email
-        )
-      `)
+      .select('*')
       .eq('pin_id', pin.id)
       .order('created_at', { ascending: true });
 
     if (!error) {
-      setComments(data || []);
+      // Map comments with empty profiles for now
+      setComments((data || []).map(comment => ({
+        ...comment,
+        profiles: undefined
+      })));
     }
   };
 
@@ -99,7 +97,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
       .select('id')
       .eq('pin_id', pin.id)
       .eq('user_id', session.session.user.id)
-      .single();
+      .maybeSingle();
 
     setIsLiked(!!data);
   };
@@ -227,7 +225,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium">
-                    {pin.profiles?.full_name || pin.profiles?.email}
+                    {pin.profiles?.full_name || pin.profiles?.email || 'Anonymous'}
                   </span>
                 </div>
               </div>
@@ -248,7 +246,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
                             <span className="text-sm font-medium">
-                              {comment.profiles?.full_name || comment.profiles?.email}
+                              {comment.profiles?.full_name || comment.profiles?.email || 'Anonymous'}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {formatDistanceToNow(new Date(comment.created_at))} ago

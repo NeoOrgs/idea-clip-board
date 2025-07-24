@@ -56,17 +56,11 @@ const Home = () => {
     
     let query = supabase
       .from('pins')
-      .select(`
-        *,
-        profiles (
-          full_name,
-          email
-        )
-      `);
+      .select('*');
 
     if (searchQuery) {
-      // Use full-text search
-      query = query.textSearch('title,description', searchQuery);
+      // Use ilike for basic text search
+      query = query.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
     }
 
     const { data, error } = await query.order('created_at', { ascending: false });
@@ -74,7 +68,11 @@ const Home = () => {
     if (error) {
       console.error('Error fetching pins:', error);
     } else {
-      setPins(data || []);
+      // Map to include empty profiles for now
+      setPins((data || []).map(pin => ({
+        ...pin,
+        profiles: undefined
+      })));
     }
     
     setLoading(false);
