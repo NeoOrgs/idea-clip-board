@@ -123,7 +123,7 @@ export const usePersonalizedFeed = () => {
         const { data: pins } = await supabase
           .from('pins')
           .select('*')
-          .not('id', 'in', `(${interactedPinIds.join(',') || '""'})`) // Exclude already interacted pins
+          .not('id', 'in', `(${interactedPinIds.join(',')}${interactedPinIds.length === 0 ? 'null' : ''})`) // Exclude already interacted pins
           .order('created_at', { ascending: false })
           .limit(50); // Get more to filter from
 
