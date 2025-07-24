@@ -2,17 +2,20 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, Plus, User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Search, Plus, User, LogOut, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 const Header = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Set up auth state listener
@@ -20,6 +23,11 @@ const Header = () => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchUserProfile(session.user.id);
+        } else {
+          setUserProfile(null);
+        }
       }
     );
 
@@ -27,10 +35,25 @@ const Header = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (!error) {
+      setUserProfile(data);
+    }
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -43,6 +66,43 @@ const Header = () => {
       navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
     } else {
       navigate('/');
+    }
+  };
+
+  const downloadProfilePicture = async () => {
+    if (!userProfile?.avatar_url) {
+      toast({
+        title: "No profile picture",
+        description: "You don't have a profile picture to download.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(userProfile.avatar_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `profile-picture-${userProfile.full_name || user?.email || 'user'}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: "Downloaded!",
+        description: "Your profile picture has been downloaded.",
+      });
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      toast({
+        title: "Download failed",
+        description: "Failed to download your profile picture.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -92,9 +152,9 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="" alt={user.email || ""} />
+                      <AvatarImage src={userProfile?.avatar_url || ""} alt={userProfile?.full_name || user.email || ""} />
                       <AvatarFallback>
-                        <User className="h-4 w-4" />
+                        {(userProfile?.full_name || user.email || '').charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -104,6 +164,13 @@ const Header = () => {
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
+                  {userProfile?.avatar_url && (
+                    <DropdownMenuItem onClick={downloadProfilePicture} className="cursor-pointer">
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Profile Picture
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign out

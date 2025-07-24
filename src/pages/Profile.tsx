@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plus, Settings } from "lucide-react";
 import Header from "@/components/Header";
 import PinGrid from "@/components/PinGrid";
+import ProfilePictureUpload from "@/components/ProfilePictureUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -35,6 +36,7 @@ interface Pin {
 
 const Profile = () => {
   const [session, setSession] = useState<Session | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [boards, setBoards] = useState<Board[]>([]);
   const [userPins, setUserPins] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,6 +45,8 @@ const Profile = () => {
   const [newBoardDescription, setNewBoardDescription] = useState("");
   const [creatingBoard, setCreatingBoard] = useState(false);
   const [error, setError] = useState("");
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -86,6 +90,19 @@ const Profile = () => {
     try {
       setLoading(true);
       
+      // Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      } else {
+        setUserProfile(profileData);
+      }
+      
       // Fetch user's boards
       const { data: boardsData, error: boardsError } = await supabase
         .from('boards')
@@ -111,6 +128,9 @@ const Profile = () => {
       } else {
         setUserPins(pinsData || []);
       }
+
+      // Fetch follow counts
+      await fetchFollowCounts();
       
     } catch (error) {
       console.error('Error:', error);
@@ -122,6 +142,25 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchFollowCounts = async () => {
+    if (!session?.user?.id) return;
+
+    // Get followers count
+    const { count: followersCount } = await supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('following_id', session.user.id);
+
+    // Get following count  
+    const { count: followingCount } = await supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('follower_id', session.user.id);
+
+    setFollowersCount(followersCount || 0);
+    setFollowingCount(followingCount || 0);
   };
 
   const handleCreateBoard = async (e: React.FormEvent) => {
@@ -179,17 +218,21 @@ const Profile = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-primary-foreground font-bold text-2xl">
-              {session.user.email?.charAt(0).toUpperCase()}
-            </span>
-          </div>
-          <h1 className="text-3xl font-bold mb-2">
-            {session.user.user_metadata?.full_name || session.user.email}
+          <ProfilePictureUpload
+            currentAvatarUrl={userProfile?.avatar_url}
+            userEmail={session.user.email || ''}
+            userId={session.user.id}
+            onAvatarUpdate={(newUrl) => setUserProfile({...userProfile, avatar_url: newUrl})}
+          />
+          <h1 className="text-3xl font-bold mb-2 mt-4">
+            {userProfile?.full_name || session.user.email}
           </h1>
-          <p className="text-muted-foreground">
-            {userPins.length} pins • {boards.length} boards
-          </p>
+          <div className="flex items-center justify-center space-x-6 text-muted-foreground">
+            <span>{userPins.length} pins</span>
+            <span>{boards.length} boards</span>
+            <span>{followersCount} followers</span>
+            <span>{followingCount} following</span>
+          </div>
         </div>
 
         {loading ? (
