@@ -44,6 +44,54 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          pin_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          pin_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          pin_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      likes: {
+        Row: {
+          created_at: string
+          id: string
+          pin_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          pin_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          pin_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pins: {
         Row: {
           board_id: string
@@ -114,6 +162,30 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_pins: {
+        Row: {
+          board_id: string
+          created_at: string
+          id: string
+          pin_id: string
+          user_id: string
+        }
+        Insert: {
+          board_id: string
+          created_at?: string
+          id?: string
+          pin_id: string
+          user_id: string
+        }
+        Update: {
+          board_id?: string
+          created_at?: string
+          id?: string
+          pin_id?: string
           user_id?: string
         }
         Relationships: []

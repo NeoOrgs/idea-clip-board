@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import SavePinDialog from "./SavePinDialog";
 
 interface Pin {
   id: string;
@@ -29,6 +30,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   return (
     <Card 
@@ -80,7 +82,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
                 className="rounded-full shadow-lg bg-primary hover:bg-primary-hover"
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Handle save functionality
+                  setShowSaveDialog(true);
                 }}
               >
                 Save
@@ -116,6 +118,13 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
           </div>
         )}
       </div>
+
+      <SavePinDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        pinId={pin.id}
+        pinTitle={pin.title}
+      />
 
       {/* Pin info */}
       <div className="p-3">

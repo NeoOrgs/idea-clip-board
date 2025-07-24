@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PinCard from "./PinCard";
+import PinModal from "./PinModal";
 import { cn } from "@/lib/utils";
 
 interface Pin {
@@ -25,6 +26,8 @@ interface PinGridProps {
 
 const PinGrid = ({ pins, onPinClick, className }: PinGridProps) => {
   const [columns, setColumns] = useState(4);
+  const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const updateColumns = () => {
@@ -83,13 +86,26 @@ const PinGrid = ({ pins, onPinClick, className }: PinGridProps) => {
               <PinCard
                 key={pin.id}
                 pin={pin}
-                onClick={() => onPinClick?.(pin)}
+                onClick={() => {
+                  setSelectedPin(pin);
+                  setShowModal(true);
+                  onPinClick?.(pin);
+                }}
                 className="w-full"
               />
             ))}
           </div>
         ))}
       </div>
+      
+      <PinModal
+        pin={selectedPin}
+        isOpen={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedPin(null);
+        }}
+      />
     </div>
   );
 };
