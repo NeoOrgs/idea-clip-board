@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Heart } from "lucide-react";
+import { MoreVertical, Heart, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SavePinDialog from "./SavePinDialog";
+import { useUserInteractions } from "@/hooks/useUserInteractions";
+import { downloadImage } from "@/utils/imageUtils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Pin {
   id: string;
@@ -31,6 +34,31 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const { logInteraction } = useUserInteractions();
+  const { toast } = useToast();
+
+  const handleClick = () => {
+    // Log click interaction
+    logInteraction({ pinId: pin.id, type: 'click' });
+    onClick?.();
+  };
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const success = await downloadImage(pin.image_url, `${pin.title.replace(/[^a-zA-Z0-9]/g, '_')}`);
+    if (success) {
+      toast({
+        title: "Success",
+        description: "Image downloaded successfully",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to download image",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Card 
@@ -38,7 +66,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
         "group relative overflow-hidden rounded-lg cursor-pointer transition-all duration-200 hover:shadow-card",
         className
       )}
-      onClick={onClick}
+      onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -86,6 +114,14 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
                 }}
               >
                 Save
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full bg-white/90 hover:bg-white text-foreground shadow-lg"
+                onClick={handleDownload}
+              >
+                <Download className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"

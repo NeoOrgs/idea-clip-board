@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { usePersonalizedFeed } from "@/hooks/usePersonalizedFeed";
+import { useUserInteractions } from "@/hooks/useUserInteractions";
 
 interface Pin {
   id: string;
@@ -31,6 +33,8 @@ const Home = () => {
   const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { personalizedPins, loading: personalizedLoading } = usePersonalizedFeed();
+  const { logSearch } = useUserInteractions();
 
   useEffect(() => {
     // Set up auth state listener
@@ -49,7 +53,9 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetchPins();
+    if (searchQuery) {
+      fetchPins();
+    }
   }, [searchQuery]);
 
   const fetchPins = async () => {
@@ -88,8 +94,18 @@ const Home = () => {
       }));
 
       setPins(pinsWithProfiles);
+      
+      // Log search interaction
+      if (searchQuery) {
+        logSearch(searchQuery, pinsWithProfiles.map(pin => pin.id));
+      }
     } else {
       setPins([]);
+      
+      // Log search interaction with empty results
+      if (searchQuery) {
+        logSearch(searchQuery, []);
+      }
     }
     
     setLoading(false);
@@ -166,8 +182,23 @@ const Home = () => {
               <p className="text-muted-foreground">Loading pins...</p>
             </div>
           </div>
+        ) : searchQuery ? (
+          <PinGrid pins={pins} onPinClick={handlePinClick} />
+        ) : personalizedLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading personalized feed...</p>
+            </div>
+          </div>
         ) : (
-          <PinGrid pins={pins} />
+          <div>
+            <div className="container mx-auto px-4 mb-6">
+              <h2 className="text-xl font-semibold">Your personalized feed</h2>
+              <p className="text-muted-foreground">Based on your interactions and preferences</p>
+            </div>
+            <PinGrid pins={personalizedPins} onPinClick={handlePinClick} />
+          </div>
         )}
       </main>
     </div>

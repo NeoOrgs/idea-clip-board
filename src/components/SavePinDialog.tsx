@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
+import { useUserInteractions } from "@/hooks/useUserInteractions";
 
 interface Board {
   id: string;
@@ -23,6 +24,7 @@ const SavePinDialog = ({ isOpen, onClose, pinId, pinTitle }: SavePinDialogProps)
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { logInteraction } = useUserInteractions();
 
   useEffect(() => {
     if (isOpen) {
@@ -78,6 +80,9 @@ const SavePinDialog = ({ isOpen, onClose, pinId, pinTitle }: SavePinDialogProps)
         });
       }
     } else {
+      // Log save interaction
+      logInteraction({ pinId, type: 'save' });
+      
       toast({
         title: "Pin saved!",
         description: `"${pinTitle}" has been saved to your board`,

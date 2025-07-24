@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Share, MoreVertical, User } from "lucide-react";
+import { Heart, MessageCircle, Share, MoreVertical, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import SavePinDialog from "./SavePinDialog";
+import { useUserInteractions } from "@/hooks/useUserInteractions";
+import { downloadImage } from "@/utils/imageUtils";
 
 interface Pin {
   id: string;
@@ -53,6 +55,23 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { logInteraction } = useUserInteractions();
+
+  const handleDownload = async () => {
+    const success = await downloadImage(pin.image_url, `${pin.title.replace(/[^a-zA-Z0-9]/g, '_')}`);
+    if (success) {
+      toast({
+        title: "Success",
+        description: "Image downloaded successfully",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to download image",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     if (pin && isOpen) {
@@ -150,6 +169,8 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
       if (!error) {
         setIsLiked(true);
         setLikesCount(prev => prev + 1);
+        // Log like interaction
+        logInteraction({ pinId: pin.id, type: 'like' });
       }
     }
   };
@@ -225,6 +246,14 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   </Button>
                   <Button variant="ghost" size="sm" className="rounded-full p-2">
                     <MessageCircle className="h-5 w-5" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="rounded-full p-2"
+                    onClick={handleDownload}
+                  >
+                    <Download className="h-5 w-5" />
                   </Button>
                   <Button variant="ghost" size="sm" className="rounded-full p-2">
                     <Share className="h-5 w-5" />
