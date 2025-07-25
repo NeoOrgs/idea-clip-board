@@ -212,6 +212,19 @@ const Profile = () => {
     return <div>Loading...</div>;
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="flex justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -235,157 +248,151 @@ const Profile = () => {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Boards Section */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold">Your Boards</h2>
-                <Dialog open={isCreateBoardOpen} onOpenChange={setIsCreateBoardOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="rounded-full">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Board
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Create New Board</DialogTitle>
-                      <DialogDescription>
-                        Create a board to organize your pins by theme
-                      </DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handleCreateBoard} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="boardName">Board Name *</Label>
-                        <Input
-                          id="boardName"
-                          placeholder="e.g., Living Room Ideas"
-                          value={newBoardName}
-                          onChange={(e) => setNewBoardName(e.target.value)}
-                          required
-                          className="rounded-xl"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="boardDescription">Description</Label>
-                        <Input
-                          id="boardDescription"
-                          placeholder="What's this board about?"
-                          value={newBoardDescription}
-                          onChange={(e) => setNewBoardDescription(e.target.value)}
-                          className="rounded-xl"
-                        />
-                      </div>
-                      {error && (
-                        <Alert variant="destructive">
-                          <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                      )}
-                      <div className="flex gap-3 pt-4">
-                        <Button 
-                          type="submit" 
-                          disabled={creatingBoard || !newBoardName.trim()}
-                          className="flex-1 rounded-xl"
-                        >
-                          {creatingBoard ? "Creating..." : "Create Board"}
-                        </Button>
-                        <Button 
-                          type="button" 
-                          variant="outline"
-                          onClick={() => setIsCreateBoardOpen(false)}
-                          className="rounded-xl"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {boards.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Plus className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">Create your first board</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Boards help you organize your pins by theme or project
-                  </p>
-                  <Button onClick={() => setIsCreateBoardOpen(true)} className="rounded-full">
+        <div className="space-y-8">
+          {/* Boards Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Your Boards</h2>
+              <Dialog open={isCreateBoardOpen} onOpenChange={setIsCreateBoardOpen}>
+                <DialogTrigger asChild>
+                  <Button className="rounded-full">
+                    <Plus className="h-4 w-4 mr-2" />
                     Create Board
                   </Button>
-                </Card>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {boards.map((board) => (
-                    <Card 
-                      key={board.id} 
-                      className="cursor-pointer hover:shadow-card transition-shadow duration-200"
-                      onClick={() => navigate(`/board/${board.id}`)}
-                    >
-                      <div className="aspect-square bg-muted rounded-t-lg flex items-center justify-center">
-                        {board.cover_image_url ? (
-                          <img 
-                            src={board.cover_image_url} 
-                            alt={board.name}
-                            className="w-full h-full object-cover rounded-t-lg"
-                          />
-                        ) : (
-                          <span className="text-4xl">📌</span>
-                        )}
-                      </div>
-                      <CardContent className="p-3">
-                        <h3 className="font-medium text-sm line-clamp-2 mb-1">
-                          {board.name}
-                        </h3>
-                        <p className="text-xs text-muted-foreground">
-                          {userPins.filter(pin => pin.board_id === board.id).length} pins
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Create New Board</DialogTitle>
+                    <DialogDescription>
+                      Create a board to organize your pins by theme
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateBoard} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="boardName">Board Name *</Label>
+                      <Input
+                        id="boardName"
+                        placeholder="e.g., Living Room Ideas"
+                        value={newBoardName}
+                        onChange={(e) => setNewBoardName(e.target.value)}
+                        required
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="boardDescription">Description</Label>
+                      <Input
+                        id="boardDescription"
+                        placeholder="What's this board about?"
+                        value={newBoardDescription}
+                        onChange={(e) => setNewBoardDescription(e.target.value)}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
+                    <div className="flex gap-3 pt-4">
+                      <Button 
+                        type="submit" 
+                        disabled={creatingBoard || !newBoardName.trim()}
+                        className="flex-1 rounded-xl"
+                      >
+                        {creatingBoard ? "Creating..." : "Create Board"}
+                      </Button>
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        onClick={() => setIsCreateBoardOpen(false)}
+                        className="rounded-xl"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {boards.length === 0 ? (
+              <Card className="p-8 text-center">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Plus className="h-8 w-8 text-muted-foreground" />
                 </div>
-              )}
-            </div>
-
-            {/* Pins Section */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold">Your Pins</h2>
-                <Button 
-                  onClick={() => navigate("/create-pin")}
-                  className="rounded-full"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Pin
+                <h3 className="text-lg font-medium mb-2">Create your first board</h3>
+                <p className="text-muted-foreground mb-4">
+                  Boards help you organize your pins by theme or project
+                </p>
+                <Button onClick={() => setIsCreateBoardOpen(true)} className="rounded-full">
+                  Create Board
                 </Button>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {boards.map((board) => (
+                  <Card 
+                    key={board.id} 
+                    className="cursor-pointer hover:shadow-card transition-shadow duration-200"
+                    onClick={() => navigate(`/board/${board.id}`)}
+                  >
+                    <div className="aspect-square bg-muted rounded-t-lg flex items-center justify-center">
+                      {board.cover_image_url ? (
+                        <img 
+                          src={board.cover_image_url} 
+                          alt={board.name}
+                          className="w-full h-full object-cover rounded-t-lg"
+                        />
+                      ) : (
+                        <span className="text-4xl">📌</span>
+                      )}
+                    </div>
+                    <CardContent className="p-3">
+                      <h3 className="font-medium text-sm line-clamp-2 mb-1">
+                        {board.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {userPins.filter(pin => pin.board_id === board.id).length} pins
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-
-              {userPins.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">📌</span>
-                  </div>
-                  <h3 className="text-lg font-medium mb-2">No pins yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Start creating pins to build your collection
-                  </p>
-                  <Button onClick={() => navigate("/create-pin")} className="rounded-full">
-                    Create Your First Pin
-                  </Button>
-                </Card>
-              ) : (
-                <PinGrid pins={userPins} onPinClick={handlePinClick} />
-              )}
-            </div>
+            )}
           </div>
-        )}
+
+          {/* Pins Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Your Pins</h2>
+              <Button 
+                onClick={() => navigate("/create-pin")}
+                className="rounded-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Pin
+              </Button>
+            </div>
+
+            {userPins.length === 0 ? (
+              <Card className="p-8 text-center">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl">📌</span>
+                </div>
+                <h3 className="text-lg font-medium mb-2">No pins yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Start creating pins to build your collection
+                </p>
+                <Button onClick={() => navigate("/create-pin")} className="rounded-full">
+                  Create Your First Pin
+                </Button>
+              </Card>
+            ) : (
+              <PinGrid pins={userPins} onPinClick={handlePinClick} />
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );
