@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { LogoProcessor } from "@/components/LogoProcessor";
 
 interface Pin {
   id: string;
@@ -154,10 +153,6 @@ const Home = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="py-8">
-        {/* Temporary logo processor - remove after processing */}
-        <div className="container mx-auto px-4 mb-8">
-          <LogoProcessor />
-        </div>
         {searchQuery && (
           <div className="container mx-auto px-4 mb-6">
             <h2 className="text-xl font-semibold">Search results for "{searchQuery}"</h2>
