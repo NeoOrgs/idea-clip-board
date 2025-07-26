@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useTheme } from "next-themes";
 
 const Header = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -18,7 +17,6 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { theme } = useTheme();
 
   useEffect(() => {
     // Set up auth state listener
@@ -114,14 +112,13 @@ const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div 
-          className="flex items-center cursor-pointer" 
+          className="flex items-center space-x-2 cursor-pointer" 
           onClick={() => navigate("/")}
         >
-          <img 
-            src={theme === 'dark' ? '/lovable-uploads/75c3262a-669c-4a33-a7ab-a6c343909014.png' : '/lovable-uploads/fc2458dd-35c0-40fd-9ac9-214426b6cb47.png'}
-            alt="PinBoard"
-            className="h-8 w-auto"
-          />
+          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-lg">P</span>
+          </div>
+          <span className="text-xl font-bold">PinBoard</span>
         </div>
 
         {/* Search Bar (centered) */}
