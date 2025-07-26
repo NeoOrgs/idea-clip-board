@@ -231,9 +231,6 @@ const UserProfile = () => {
     }
   };
 
-  const handlePinClick = (pin: Pin) => {
-    navigate(`/pin/${pin.id}`);
-  };
 
   if (loading || !userProfile) {
     return (
@@ -366,7 +363,7 @@ const UserProfile = () => {
                 </p>
               </Card>
             ) : (
-              <PinGrid pins={userPins} onPinClick={handlePinClick} />
+              <PinGrid pins={userPins} />
             )}
           </div>
         </div>

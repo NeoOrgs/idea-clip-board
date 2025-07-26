@@ -95,9 +95,6 @@ const Home = () => {
     setLoading(false);
   };
 
-  const handlePinClick = (pin: Pin) => {
-    navigate(`/pin/${pin.id}`);
-  };
 
   if (!session) {
     return (
@@ -141,7 +138,7 @@ const Home = () => {
               <h2 className="text-2xl font-semibold text-center mb-8">
                 Discover inspiring ideas
               </h2>
-              <PinGrid pins={pins.slice(0, 12)} onPinClick={handlePinClick} />
+              <PinGrid pins={pins.slice(0, 12)} />
             </div>
           )}
         </main>
