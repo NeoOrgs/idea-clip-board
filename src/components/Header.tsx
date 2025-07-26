@@ -7,6 +7,7 @@ import { Search, Plus, User, LogOut, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Header = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -138,6 +139,7 @@ const Header = () => {
         <div className="flex items-center space-x-3">
           {user ? (
             <>
+              <ThemeToggle />
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -180,6 +182,7 @@ const Header = () => {
             </>
           ) : (
             <div className="flex items-center space-x-2">
+              <ThemeToggle />
               <Button 
                 variant="outline" 
                 onClick={() => navigate("/auth")}
