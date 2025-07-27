@@ -115,9 +115,11 @@ const Header = () => {
           className="flex items-center space-x-2 cursor-pointer flex-shrink-0" 
           onClick={() => navigate("/")}
         >
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-lg">P</span>
-          </div>
+          <img 
+            src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
+            alt="PinBoard Logo" 
+            className="w-8 h-8"
+          />
           <span className="text-lg md:text-xl font-bold hidden sm:block">PinBoard</span>
         </div>
 
