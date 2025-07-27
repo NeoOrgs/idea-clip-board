@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import PinGrid from "@/components/PinGrid";
+import PinModal from "@/components/PinModal";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -27,10 +28,19 @@ const Home = () => {
   const [pins, setPins] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
+  const { pinId } = useParams();
   const searchQuery = searchParams.get('search');
   const [session, setSession] = useState<Session | null>(null);
+  const [showPinModal, setShowPinModal] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check if we're on a pin route
+  useEffect(() => {
+    if (pinId) {
+      setShowPinModal(true);
+    }
+  }, [pinId]);
 
   useEffect(() => {
     // Set up auth state listener
@@ -139,6 +149,17 @@ const Home = () => {
                 Discover inspiring ideas
               </h2>
               <PinGrid pins={pins.slice(0, 12)} />
+              {pinId && (
+                <PinModal
+                  pin={null}
+                  pinId={pinId}
+                  isOpen={showPinModal}
+                  onClose={() => {
+                    setShowPinModal(false);
+                    navigate('/');
+                  }}
+                />
+              )}
             </div>
           )}
         </main>
@@ -165,6 +186,18 @@ const Home = () => {
           </div>
         ) : (
           <PinGrid pins={pins} />
+        )}
+        
+        {pinId && (
+          <PinModal
+            pin={null}
+            pinId={pinId}
+            isOpen={showPinModal}
+            onClose={() => {
+              setShowPinModal(false);
+              navigate('/');
+            }}
+          />
         )}
       </main>
     </div>

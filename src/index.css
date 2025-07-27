@@ -75,41 +75,55 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Modern dark theme with rich contrast and Pinterest-inspired accents */
+    --background: 222 47% 11%;
+    --foreground: 210 38% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 223 47% 15%;
+    --card-foreground: 210 38% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 223 47% 15%;
+    --popover-foreground: 210 38% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Pinterest red adapted for dark mode */
+    --primary: 0 84% 68%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 27% 20%;
+    --secondary-foreground: 210 38% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 27% 18%;
+    --muted-foreground: 217 10% 64%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 220 27% 22%;
+    --accent-foreground: 210 38% 95%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 68%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 220 27% 25%;
+    --input: 220 27% 18%;
+    --ring: 0 84% 68%;
+    
+    /* Enhanced Pinterest-inspired tokens for dark mode */
+    --pinterest-red: 0 84% 68%;
+    --pinterest-red-hover: 0 84% 72%;
+    --soft-gray: 220 27% 18%;
+    --medium-gray: 220 27% 25%;
+    --text-light: 217 10% 64%;
+    
+    /* Rich shadows for dark mode */
+    --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 8px 40px -8px hsl(0 0% 0% / 0.6);
+    
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 38% 95%;
+    --sidebar-primary: 0 84% 68%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 220 27% 18%;
+    --sidebar-accent-foreground: 210 38% 95%;
+    --sidebar-border: 220 27% 25%;
+    --sidebar-ring: 0 84% 68%;
   }
 }
 
@@ -120,5 +134,67 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  /* Interactive Elements */
+  .story-link {
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:scale-105 hover:-translate-y-2 hover:shadow-card;
+  }
+  
+  /* Loading states */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--muted-foreground) / 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+  
+  /* Enhanced focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-background;
+  }
+  
+  /* Modern glass effect */
+  .glass {
+    @apply backdrop-blur-md bg-background/80 border border-border/50;
+  }
+  
+  /* Smooth scrolling */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
+  }
+  
+  .smooth-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .smooth-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .smooth-scroll::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+  
+  .smooth-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.5);
   }
 }

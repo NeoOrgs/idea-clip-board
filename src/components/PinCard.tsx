@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
+import { gsapAnimations } from "@/hooks/useGSAP";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -32,11 +33,20 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      const cleanup = gsapAnimations.pinHover(cardRef.current);
+      return cleanup;
+    }
+  }, []);
 
   return (
     <Card 
+      ref={cardRef}
       className={cn(
-        "group relative overflow-hidden rounded-lg cursor-pointer transition-all duration-200 hover:shadow-card",
+        "group relative overflow-hidden rounded-xl cursor-pointer transition-all duration-200 hover:shadow-card border-0 bg-card/80 backdrop-blur-sm",
         className
       )}
       onClick={onClick}

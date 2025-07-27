@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PinCard from "./PinCard";
-import PinModal from "./PinModal";
 import { cn } from "@/lib/utils";
 
 interface Pin {
@@ -26,8 +26,7 @@ interface PinGridProps {
 
 const PinGrid = ({ pins, onPinClick, className }: PinGridProps) => {
   const [columns, setColumns] = useState(4);
-  const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateColumns = () => {
@@ -87,8 +86,7 @@ const PinGrid = ({ pins, onPinClick, className }: PinGridProps) => {
                 key={pin.id}
                 pin={pin}
                 onClick={() => {
-                  setSelectedPin(pin);
-                  setShowModal(true);
+                  navigate(`/pin/${pin.id}`);
                   onPinClick?.(pin);
                 }}
                 className="w-full"
@@ -97,15 +95,6 @@ const PinGrid = ({ pins, onPinClick, className }: PinGridProps) => {
           </div>
         ))}
       </div>
-      
-      <PinModal
-        pin={selectedPin}
-        isOpen={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setSelectedPin(null);
-        }}
-      />
     </div>
   );
 };
