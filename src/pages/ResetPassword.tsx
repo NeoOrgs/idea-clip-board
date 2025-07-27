@@ -19,22 +19,14 @@ const ResetPassword = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/");
-      }
-    };
-    
-    checkUser();
-
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === "PASSWORD_RECOVERY") {
-          // User clicked the reset link, we're in recovery mode
-        } else if (session) {
+          // User clicked the reset link, stay on this page for password reset
+          return;
+        } else if (event === "SIGNED_IN" && session) {
+          // Only redirect on actual sign in, not password recovery
           navigate("/");
         }
       }
