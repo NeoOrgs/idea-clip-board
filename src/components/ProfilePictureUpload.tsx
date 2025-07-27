@@ -26,13 +26,25 @@ const ProfilePictureUpload = ({
     try {
       setUploading(true);
       
+      // First, delete all existing files for this user
+      const { data: existingFiles } = await supabase.storage
+        .from('avatars')
+        .list(userId);
+
+      if (existingFiles && existingFiles.length > 0) {
+        const filesToDelete = existingFiles.map(file => `${userId}/${file.name}`);
+        await supabase.storage
+          .from('avatars')
+          .remove(filesToDelete);
+      }
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}/avatar.${fileExt}`;
       
-      // Upload to Supabase storage
+      // Upload new file
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, file);
 
       if (uploadError) {
         throw uploadError;

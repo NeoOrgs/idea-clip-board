@@ -260,10 +260,10 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
               </div>
 
               {/* Comments Section */}
-              <div className="flex-1 flex flex-col p-4">
+              <div className="flex-1 flex flex-col p-4 min-h-0">
                 <h3 className="font-medium mb-3">Comments</h3>
                 
-                <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                <div className="flex-1 overflow-y-auto space-y-3 mb-4 min-h-0">
                   {comments.map((comment) => (
                     <Card key={comment.id} className="p-3">
                       <div className="flex items-start space-x-2">
@@ -295,8 +295,8 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   ))}
                 </div>
 
-                {/* Add Comment */}
-                <div className="space-y-2">
+                {/* Add Comment - Fixed positioning */}
+                <div className="space-y-2 flex-shrink-0 border-t pt-4">
                   <Textarea
                     placeholder="Add a comment..."
                     value={newComment}
@@ -308,6 +308,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                     onClick={addComment} 
                     disabled={!newComment.trim() || loading}
                     size="sm"
+                    className="w-full"
                   >
                     Post
                   </Button>
