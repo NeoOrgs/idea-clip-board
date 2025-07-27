@@ -161,11 +161,11 @@ All colors MUST be HSL.
   }
   
   .hover-lift {
-    @apply transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-hover;
+    @apply transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-card;
   }
   
   .hover-float {
-    @apply transition-all duration-500 hover:-translate-y-2 hover:shadow-hover;
+    @apply transition-all duration-500 hover:-translate-y-2 hover:shadow-card;
   }
   
   /* Loading states */
