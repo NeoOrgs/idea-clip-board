@@ -116,7 +116,7 @@ const Auth = () => {
               <img 
             src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
             alt="PinBoard Logo" 
-            className="w-8 h-8"
+            className="w-12 h-12"
           />
             </div>
             <CardTitle className="text-2xl">
