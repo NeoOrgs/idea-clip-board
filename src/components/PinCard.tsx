@@ -6,6 +6,7 @@ import { MoreVertical, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SavePinDialog from "./SavePinDialog";
 import ImageActions from "./ImageActions";
+import { getResponsiveImageUrl, preloadImage } from "@/utils/imageUtils";
 
 interface Pin {
   id: string;
@@ -33,6 +34,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [isHighQualityLoaded, setIsHighQualityLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,6 +43,18 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
       return cleanup;
     }
   }, []);
+
+  // Preload high quality image on hover
+  useEffect(() => {
+    if (isHovered && !isHighQualityLoaded) {
+      const highQualityUrl = getResponsiveImageUrl(pin.image_url, 'high');
+      preloadImage(highQualityUrl)
+        .then(() => setIsHighQualityLoaded(true))
+        .catch(() => {
+          // Silently fail, keep showing low quality image
+        });
+    }
+  }, [isHovered, pin.image_url, isHighQualityLoaded]);
 
   return (
     <Card 
@@ -58,7 +72,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
         <div className="relative overflow-hidden rounded-lg">
           {!imageError ? (
             <img
-              src={pin.image_url}
+              src={isHighQualityLoaded ? getResponsiveImageUrl(pin.image_url, 'high') : getResponsiveImageUrl(pin.image_url, 'low')}
               alt={pin.title}
               className={cn(
                 "w-full h-auto object-cover transition-all duration-300",
