@@ -125,18 +125,28 @@ export const GroupChatView = ({ group, onOpenSettings, onOpenInvite }: GroupChat
 
   const fetchMessageWithProfile = async (messageId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data: messageData, error } = await supabase
         .from('group_messages')
-        .select(`
-          *,
-          profiles(full_name, avatar_url, email)
-        `)
+        .select('*')
         .eq('id', messageId)
         .single();
 
       if (error) throw error;
-      if (data) {
-        setMessages(prev => [...prev, data]);
+      
+      if (messageData) {
+        // Fetch profile separately
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, avatar_url, email')
+          .eq('user_id', messageData.user_id)
+          .single();
+
+        const messageWithProfile = {
+          ...messageData,
+          profiles: profileData || null
+        };
+
+        setMessages(prev => [...prev, messageWithProfile]);
       }
     } catch (error) {
       console.error('Error fetching new message:', error);
