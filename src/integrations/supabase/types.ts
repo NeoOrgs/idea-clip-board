@@ -382,6 +382,12 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_user_groups: {
+        Args: { user_uuid: string }
+        Returns: {
+          group_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
