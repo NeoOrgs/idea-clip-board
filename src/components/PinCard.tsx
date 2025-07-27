@@ -91,19 +91,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
               <ImageActions 
                 imageUrl={pin.image_url} 
                 title={pin.title}
-                className="bg-white/90 backdrop-blur-sm rounded-full p-1"
               />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full bg-white/90 hover:bg-white text-foreground shadow-lg"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  // Handle more options
-                }}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
             </div>
             
             {pin.original_url && (

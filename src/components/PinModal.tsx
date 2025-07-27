@@ -212,9 +212,6 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   </Button>
                   <div className="flex items-center space-x-2">
                     <ImageActions imageUrl={pin.image_url} title={pin.title} />
-                    <Button variant="ghost" size="sm" className="rounded-full hover-scale">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
 
