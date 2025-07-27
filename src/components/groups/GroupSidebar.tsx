@@ -55,13 +55,21 @@ export const GroupSidebar = ({ selectedGroupId, onGroupSelect, className }: Grou
 
   const fetchUserGroups = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Starting fetchUserGroups...');
+      
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
+      
       if (!user) {
-        console.log('No user found');
+        console.log('No user found, setting empty groups');
+        setGroups([]);
         return;
       }
 
-      console.log('Fetching groups for user:', user.id);
+      console.log('Current user ID:', user.id);
 
       // First get the group memberships
       const { data: memberData, error: memberError } = await supabase
@@ -77,12 +85,15 @@ export const GroupSidebar = ({ selectedGroupId, onGroupSelect, className }: Grou
       console.log('Member data:', memberData);
 
       if (!memberData || memberData.length === 0) {
+        console.log('No group memberships found, setting empty groups');
         setGroups([]);
         return;
       }
 
       // Then get the groups details
       const groupIds = memberData.map(m => m.group_id);
+      console.log('Fetching groups with IDs:', groupIds);
+      
       const { data: groupsData, error: groupsError } = await supabase
         .from('groups')
         .select('*')
@@ -105,16 +116,19 @@ export const GroupSidebar = ({ selectedGroupId, onGroupSelect, className }: Grou
         };
       });
 
-      console.log('Final groups:', groupsWithRoles);
+      console.log('Final groups with roles:', groupsWithRoles);
       setGroups(groupsWithRoles);
     } catch (error) {
-      console.error('Error fetching groups:', error);
+      console.error('Error in fetchUserGroups:', error);
       toast({
         title: 'Error',
-        description: 'Failed to load groups',
+        description: `Failed to load groups: ${error.message || 'Unknown error'}`,
         variant: 'destructive',
       });
+      // Set empty groups on error so UI doesn't stay in loading state
+      setGroups([]);
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
     }
   };
