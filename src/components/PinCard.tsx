@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { gsapAnimations } from "@/hooks/useGSAP";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Heart } from "lucide-react";
+import { MoreVertical, Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SavePinDialog from "./SavePinDialog";
 import ImageActions from "./ImageActions";
 import { getResponsiveImageUrl, preloadImage } from "@/utils/imageUtils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Pin {
   id: string;
@@ -35,6 +36,9 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [isHighQualityLoaded, setIsHighQualityLoaded] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [statsLoaded, setStatsLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,7 +48,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
     }
   }, []);
 
-  // Preload high quality image on hover
+  // Preload high quality image and fetch stats on hover
   useEffect(() => {
     if (isHovered && !isHighQualityLoaded) {
       const highQualityUrl = getResponsiveImageUrl(pin.image_url, 'high');
@@ -54,13 +58,39 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
           // Silently fail, keep showing low quality image
         });
     }
-  }, [isHovered, pin.image_url, isHighQualityLoaded]);
+    
+    if (isHovered && !statsLoaded) {
+      fetchPinStats();
+    }
+  }, [isHovered, pin.image_url, isHighQualityLoaded, statsLoaded]);
+
+  const fetchPinStats = async () => {
+    try {
+      // Fetch likes count
+      const { count: likes } = await supabase
+        .from('likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('pin_id', pin.id);
+
+      // Fetch comments count
+      const { count: comments } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('pin_id', pin.id);
+
+      setLikesCount(likes || 0);
+      setCommentsCount(comments || 0);
+      setStatsLoaded(true);
+    } catch (error) {
+      console.error('Error fetching pin stats:', error);
+    }
+  };
 
   return (
     <Card 
       ref={cardRef}
       className={cn(
-        "group relative overflow-hidden rounded-xl cursor-pointer transition-all duration-200 hover:shadow-card border-0 bg-card/80 backdrop-blur-sm",
+        "group relative overflow-hidden rounded-2xl cursor-pointer pin-card bg-gradient-card",
         className
       )}
       onClick={onClick}
@@ -69,7 +99,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
     >
       <div className="relative">
         {/* Image */}
-        <div className="relative overflow-hidden rounded-lg">
+        <div className="relative overflow-hidden rounded-xl">
           {!imageError ? (
             <img
               src={isHighQualityLoaded ? getResponsiveImageUrl(pin.image_url, 'high') : getResponsiveImageUrl(pin.image_url, 'low')}
@@ -104,7 +134,7 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
             <div className="absolute top-2 right-2 flex space-x-2">
               <Button
                 size="sm"
-                className="rounded-full shadow-lg bg-primary hover:bg-primary-hover"
+                className="rounded-full shadow-lg bg-primary hover:bg-primary-hover btn-modern text-white font-medium"
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowSaveDialog(true);
@@ -118,8 +148,24 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
               />
             </div>
             
+            {/* Stats overlay */}
+            <div className="absolute bottom-2 left-2 flex items-center gap-2">
+              {statsLoaded && (
+                <div className="flex items-center gap-3 bg-black/70 backdrop-blur-sm rounded-full px-3 py-1.5 text-white text-xs">
+                  <div className="flex items-center gap-1">
+                    <Heart className="h-3 w-3" />
+                    <span>{likesCount}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MessageCircle className="h-3 w-3" />
+                    <span>{commentsCount}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {pin.original_url && (
-              <div className="absolute bottom-2 left-2">
+              <div className="absolute bottom-2 right-2">
                 <Button
                   variant="ghost"
                   size="sm"

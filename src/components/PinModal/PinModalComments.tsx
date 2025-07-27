@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { MoreHorizontal, Trash2 } from "lucide-react";
 
 interface Comment {
   id: string;
@@ -28,8 +30,19 @@ interface PinModalCommentsProps {
 const PinModalComments = ({ comments, pinId, onCommentsUpdate }: PinModalCommentsProps) => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deletingComment, setDeletingComment] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Get current user ID
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: session } = await supabase.auth.getSession();
+      setCurrentUserId(session.session?.user.id || null);
+    };
+    getCurrentUser();
+  }, []);
 
   const addComment = async () => {
     if (!newComment.trim()) return;
@@ -59,6 +72,32 @@ const PinModalComments = ({ comments, pinId, onCommentsUpdate }: PinModalComment
     setLoading(false);
   };
 
+  const deleteComment = async (commentId: string) => {
+    if (!currentUserId) return;
+
+    setDeletingComment(commentId);
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('user_id', currentUserId); // Extra security check
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete comment",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Comment deleted",
+        description: "Your comment has been deleted successfully.",
+      });
+      onCommentsUpdate();
+    }
+    setDeletingComment(null);
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-background">
       {/* Comments header */}
@@ -86,16 +125,42 @@ const PinModalComments = ({ comments, pinId, onCommentsUpdate }: PinModalComment
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span 
-                      className="font-medium text-sm cursor-pointer hover:text-primary transition-colors"
-                      onClick={() => navigate(`/user/${comment.user_id}`)}
-                    >
-                      {comment.profiles?.full_name || comment.profiles?.email || 'Anonymous'}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(comment.created_at))} ago
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span 
+                        className="font-medium text-sm cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => navigate(`/user/${comment.user_id}`)}
+                      >
+                        {comment.profiles?.full_name || comment.profiles?.email || 'Anonymous'}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(comment.created_at))} ago
+                      </span>
+                    </div>
+                    {currentUserId === comment.user_id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            disabled={deletingComment === comment.id}
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => deleteComment(comment.id)}
+                            className="text-destructive focus:text-destructive"
+                            disabled={deletingComment === comment.id}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            {deletingComment === comment.id ? "Deleting..." : "Delete"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
                   <p className="text-sm leading-relaxed">{comment.content}</p>
                 </div>

@@ -223,36 +223,53 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen gradient-warm">
       <Header />
       <main className="container mx-auto px-4 py-8">
         {/* Profile Header */}
-        <div className="text-center mb-8">
-          <NewProfilePictureUpload
-            currentAvatarUrl={userProfile?.avatar_url}
-            userEmail={session.user.email || ''}
-            userId={session.user.id}
-            onAvatarUpdate={(newUrl) => setUserProfile({...userProfile, avatar_url: newUrl})}
-          />
-          <h1 className="text-2xl md:text-3xl font-bold mb-2 mt-4">
+        <div className="text-center mb-12">
+          <div className="relative inline-block mb-6">
+            <NewProfilePictureUpload
+              currentAvatarUrl={userProfile?.avatar_url}
+              userEmail={session.user.email || ''}
+              userId={session.user.id}
+              onAvatarUpdate={(newUrl) => setUserProfile({...userProfile, avatar_url: newUrl})}
+            />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gradient">
             {userProfile?.full_name || session.user.email}
           </h1>
-          <div className="flex items-center justify-center space-x-4 md:space-x-6 text-muted-foreground text-sm md:text-base">
-            <span>{userPins.length} pins</span>
-            <span>{boards.length} boards</span>
-            <span>{followersCount} followers</span>
-            <span>{followingCount} following</span>
+          <div className="flex items-center justify-center space-x-6 md:space-x-8 text-muted-foreground">
+            <div className="text-center">
+              <div className="text-lg md:text-xl font-semibold text-foreground">{userPins.length}</div>
+              <div className="text-sm">pins</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg md:text-xl font-semibold text-foreground">{boards.length}</div>
+              <div className="text-sm">boards</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg md:text-xl font-semibold text-foreground">{followersCount}</div>
+              <div className="text-sm">followers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg md:text-xl font-semibold text-foreground">{followingCount}</div>
+              <div className="text-sm">following</div>
+            </div>
           </div>
         </div>
 
         <div className="space-y-8">
           {/* Boards Section */}
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Your Boards</h2>
+              <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold mb-2 text-gradient">Your Boards</h2>
+                <p className="text-muted-foreground">Organize your pins into themed collections</p>
+              </div>
               <Dialog open={isCreateBoardOpen} onOpenChange={setIsCreateBoardOpen}>
                 <DialogTrigger asChild>
-                  <Button className="rounded-full">
+                  <Button className="rounded-full btn-modern shadow-card hover:shadow-hover">
                     <Plus className="h-4 w-4 mr-2" />
                     Create Board
                   </Button>
@@ -314,15 +331,15 @@ const Profile = () => {
             </div>
 
             {boards.length === 0 ? (
-              <Card className="p-8 text-center">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Plus className="h-8 w-8 text-muted-foreground" />
+              <Card className="p-12 text-center glass-card rounded-2xl border-0">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Plus className="h-10 w-10 text-primary" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">Create your first board</h3>
-                <p className="text-muted-foreground mb-4">
-                  Boards help you organize your pins by theme or project
+                <h3 className="text-xl font-semibold mb-3 text-gradient">Create your first board</h3>
+                <p className="text-muted-foreground mb-6 text-lg max-w-md mx-auto">
+                  Boards help you organize your pins by theme or project. Start collecting your favorite ideas!
                 </p>
-                <Button onClick={() => setIsCreateBoardOpen(true)} className="rounded-full">
+                <Button onClick={() => setIsCreateBoardOpen(true)} className="rounded-full btn-modern shadow-card hover:shadow-hover px-8 py-3 text-lg">
                   Create Board
                 </Button>
               </Card>
@@ -331,7 +348,7 @@ const Profile = () => {
                 {boards.map((board) => (
                   <Card 
                     key={board.id} 
-                    className="cursor-pointer hover:shadow-lg transition-all duration-200 group"
+                    className="cursor-pointer pin-card group rounded-2xl border-0"
                     onClick={() => navigate(`/board/${board.id}`)}
                   >
                     <div className="aspect-square bg-muted rounded-t-lg flex items-center justify-center overflow-hidden">
@@ -361,11 +378,14 @@ const Profile = () => {
 
           {/* Pins Section */}
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Your Pins</h2>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-3xl font-bold mb-2 text-gradient">Your Pins</h2>
+                <p className="text-muted-foreground">All your saved ideas in one place</p>
+              </div>
               <Button 
                 onClick={() => navigate("/create-pin")}
-                className="rounded-full"
+                className="rounded-full btn-modern shadow-card hover:shadow-hover"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create Pin
@@ -373,15 +393,15 @@ const Profile = () => {
             </div>
 
             {userPins.length === 0 ? (
-              <Card className="p-8 text-center">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">📌</span>
+              <Card className="p-12 text-center glass-card rounded-2xl border-0">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl">📌</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">No pins yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  Start creating pins to build your collection
+                <h3 className="text-xl font-semibold mb-3 text-gradient">No pins yet</h3>
+                <p className="text-muted-foreground mb-6 text-lg max-w-md mx-auto">
+                  Start creating pins to build your collection and share your favorite ideas with the world
                 </p>
-                <Button onClick={() => navigate("/create-pin")} className="rounded-full">
+                <Button onClick={() => navigate("/create-pin")} className="rounded-full btn-modern shadow-card hover:shadow-hover px-8 py-3 text-lg">
                   Create Your First Pin
                 </Button>
               </Card>

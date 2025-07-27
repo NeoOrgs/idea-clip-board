@@ -112,28 +112,33 @@ const Home = () => {
         <Header />
         <main className="container mx-auto px-4 py-8">
           {/* Hero Section */}
-          <div className="text-center py-16 max-w-4xl mx-auto">
-            <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-pinterest-red bg-clip-text text-transparent">
-              Save ideas you like
+          <div className="text-center py-20 max-w-5xl mx-auto">
+            <div className="mb-8">
+              <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                ✨ Discover & Save Ideas
+              </span>
+            </div>
+            <h1 className="text-6xl md:text-7xl font-bold mb-8 text-gradient leading-tight">
+              Save ideas you love
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-              Collect your favorites so you can get back to them later. Create boards to organize your pins by theme.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-3xl mx-auto">
+              Collect your favorites so you can get back to them later. Create beautiful boards to organize your pins by theme and inspiration.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg"
                 onClick={() => navigate("/auth")}
-                className="rounded-full px-8"
+                className="rounded-full px-10 py-6 text-lg font-semibold btn-modern shadow-card hover:shadow-hover"
               >
-                Sign up
+                Get Started Free
               </Button>
               <Button 
                 variant="outline"
                 size="lg" 
                 onClick={() => navigate("/auth")}
-                className="rounded-full px-8"
+                className="rounded-full px-10 py-6 text-lg font-semibold border-2 hover:bg-accent/50"
               >
-                Log in
+                Sign In
               </Button>
             </div>
           </div>
@@ -145,9 +150,14 @@ const Home = () => {
             </div>
           ) : (
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-center mb-8">
-                Discover inspiring ideas
-              </h2>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gradient">
+                  Discover inspiring ideas
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Explore beautiful pins from our community and get inspired for your next project
+                </p>
+              </div>
               <PinGrid pins={pins.slice(0, 12)} />
               {pinId && (
                 <PinModal
@@ -168,7 +178,7 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-warm">
       <Header />
       <main className="py-8">
         {searchQuery && (
