@@ -187,29 +187,29 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden animate-scale-in">
           <div className="flex h-full">
             {/* Image Section */}
             <div className="flex-1 bg-black flex items-center justify-center">
               <img
                 src={pin.image_url}
                 alt={pin.title}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-contain transition-transform hover:scale-105"
               />
             </div>
 
             {/* Content Section */}
-            <div className="w-96 flex flex-col bg-background">
+            <div className="w-96 flex flex-col bg-background animate-slide-in-right">
               {/* Header */}
-              <div className="p-4 border-b">
+              <div className="p-4 border-b animate-fade-in">
                 <div className="flex items-center justify-between mb-3">
                   <Button
                     onClick={() => setShowSaveDialog(true)}
-                    className="rounded-full"
+                    className="rounded-full hover:shadow-lg transition-all hover-scale"
                   >
                     Save
                   </Button>
-                  <Button variant="ghost" size="sm" className="rounded-full">
+                  <Button variant="ghost" size="sm" className="rounded-full hover-scale">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </div>
@@ -218,31 +218,31 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="rounded-full p-2"
+                    className="rounded-full p-2 hover-scale transition-colors"
                     onClick={toggleLike}
                   >
-                    <Heart className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                    <Heart className={`h-5 w-5 transition-all ${isLiked ? 'fill-red-500 text-red-500 scale-110' : 'hover:text-red-400'}`} />
                   </Button>
-                  <Button variant="ghost" size="sm" className="rounded-full p-2">
+                  <Button variant="ghost" size="sm" className="rounded-full p-2 hover-scale">
                     <MessageCircle className="h-5 w-5" />
                   </Button>
-                  <Button variant="ghost" size="sm" className="rounded-full p-2">
+                  <Button variant="ghost" size="sm" className="rounded-full p-2 hover-scale">
                     <Share className="h-5 w-5" />
                   </Button>
                 </div>
 
                 {likesCount > 0 && (
-                  <p className="text-sm font-medium mb-2">{likesCount} likes</p>
+                  <p className="text-sm font-medium mb-2 animate-fade-in">{likesCount} likes</p>
                 )}
 
-                <h2 className="text-xl font-bold mb-2">{pin.title}</h2>
+                <h2 className="text-xl font-bold mb-2 animate-fade-in">{pin.title}</h2>
                 {pin.description && (
-                  <p className="text-muted-foreground text-sm mb-3">{pin.description}</p>
+                  <p className="text-muted-foreground text-sm mb-3 animate-fade-in leading-relaxed">{pin.description}</p>
                 )}
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 animate-fade-in">
                   <Avatar 
-                    className="h-8 w-8 cursor-pointer"
+                    className="h-8 w-8 cursor-pointer transition-transform hover:scale-110"
                     onClick={() => navigate(`/user/${pin.user_id}`)}
                   >
                     <AvatarImage src={pin.profiles?.avatar_url} />
@@ -251,7 +251,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                     </AvatarFallback>
                   </Avatar>
                   <span 
-                    className="text-sm font-medium cursor-pointer hover:underline"
+                    className="text-sm font-medium cursor-pointer story-link transition-colors"
                     onClick={() => navigate(`/user/${pin.user_id}`)}
                   >
                     {pin.profiles?.full_name || pin.profiles?.email || 'Anonymous'}
@@ -261,14 +261,18 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
 
               {/* Comments Section */}
               <div className="flex-1 flex flex-col p-4 min-h-0">
-                <h3 className="font-medium mb-3">Comments</h3>
+                <h3 className="font-medium mb-3 animate-fade-in">Comments</h3>
                 
                 <div className="flex-1 overflow-y-auto space-y-3 mb-4 min-h-0">
-                  {comments.map((comment) => (
-                    <Card key={comment.id} className="p-3">
+                  {comments.map((comment, index) => (
+                    <Card 
+                      key={comment.id} 
+                      className="p-3 animate-fade-in hover-scale border-0 bg-muted/20"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
                       <div className="flex items-start space-x-2">
                         <Avatar 
-                          className="h-6 w-6 cursor-pointer"
+                          className="h-6 w-6 cursor-pointer transition-transform hover:scale-110"
                           onClick={() => navigate(`/user/${comment.user_id}`)}
                         >
                           <AvatarImage src={comment.profiles?.avatar_url} />
@@ -279,7 +283,7 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-1">
                             <span 
-                              className="text-sm font-medium cursor-pointer hover:underline"
+                              className="text-sm font-medium cursor-pointer story-link transition-colors"
                               onClick={() => navigate(`/user/${comment.user_id}`)}
                             >
                               {comment.profiles?.full_name || comment.profiles?.email || 'Anonymous'}
@@ -288,30 +292,39 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                               {formatDistanceToNow(new Date(comment.created_at))} ago
                             </span>
                           </div>
-                          <p className="text-sm">{comment.content}</p>
+                          <p className="text-sm leading-relaxed">{comment.content}</p>
                         </div>
                       </div>
                     </Card>
                   ))}
                 </div>
 
-                {/* Add Comment - Fixed positioning */}
-                <div className="space-y-2 flex-shrink-0 border-t pt-4">
+                {/* Add Comment - Fixed positioning with animations */}
+                <div className="flex-shrink-0 border-t pt-4 space-y-3 animate-fade-in">
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={addComment} 
+                      disabled={!newComment.trim() || loading}
+                      size="sm"
+                      className="rounded-full px-6 transition-all hover:shadow-md"
+                    >
+                      {loading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                          Posting...
+                        </>
+                      ) : (
+                        'Post'
+                      )}
+                    </Button>
+                  </div>
                   <Textarea
                     placeholder="Add a comment..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    className="resize-none"
-                    rows={2}
+                    className="resize-none transition-all focus:ring-2 focus:ring-primary/20 border-muted"
+                    rows={3}
                   />
-                  <Button 
-                    onClick={addComment} 
-                    disabled={!newComment.trim() || loading}
-                    size="sm"
-                    className="w-full"
-                  >
-                    Post
-                  </Button>
                 </div>
               </div>
             </div>

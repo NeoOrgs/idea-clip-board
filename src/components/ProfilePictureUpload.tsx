@@ -58,12 +58,17 @@ const ProfilePictureUpload = ({
       const avatarUrl = data.publicUrl;
 
       // Update the user's profile
-      const { error: updateError } = await supabase
+      console.log('Updating profile for user:', userId, 'with URL:', avatarUrl);
+      const { error: updateError, data: updateData } = await supabase
         .from('profiles')
         .update({ avatar_url: avatarUrl })
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .select();
+
+      console.log('Update result:', { updateError, updateData });
 
       if (updateError) {
+        console.error('Profile update error:', updateError);
         throw updateError;
       }
 
