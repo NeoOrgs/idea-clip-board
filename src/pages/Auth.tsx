@@ -117,7 +117,7 @@ const Auth = () => {
     setMessage("");
 
     try {
-      const redirectUrl = `${window.location.origin}/auth`;
+      const redirectUrl = `https://idea-clip-board.vercel.app/auth/reset-pass`;
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectUrl,
