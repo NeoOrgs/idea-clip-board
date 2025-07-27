@@ -228,7 +228,7 @@ const PinModal = ({ pin, isOpen, onClose, pinId }: PinModalProps) => {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent ref={modalRef} className="max-w-6xl max-h-[95vh] p-0 overflow-hidden">
+        <DialogContent ref={modalRef} className="max-w-6xl max-h-[95vh] p-0 overflow-hidden" hideCloseButton>
           <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
             {/* Image Section */}
             <div className="relative bg-muted/30 flex items-center justify-center p-4">
