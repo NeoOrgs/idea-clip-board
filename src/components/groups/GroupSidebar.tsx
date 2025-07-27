@@ -56,26 +56,57 @@ export const GroupSidebar = ({ selectedGroupId, onGroupSelect, className }: Grou
   const fetchUserGroups = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.log('No user found');
+        return;
+      }
 
-      const { data, error } = await supabase
+      console.log('Fetching groups for user:', user.id);
+
+      // First get the group memberships
+      const { data: memberData, error: memberError } = await supabase
         .from('group_members')
-        .select(`
-          group_id,
-          role,
-          groups!inner(*)
-        `)
+        .select('group_id, role')
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (memberError) {
+        console.error('Error fetching group members:', memberError);
+        throw memberError;
+      }
 
-      const groupsData = data?.map(item => ({
-        ...item.groups,
-        member_role: item.role,
-        unread_count: 0 // TODO: Calculate unread messages
-      })) || [];
+      console.log('Member data:', memberData);
 
-      setGroups(groupsData);
+      if (!memberData || memberData.length === 0) {
+        setGroups([]);
+        return;
+      }
+
+      // Then get the groups details
+      const groupIds = memberData.map(m => m.group_id);
+      const { data: groupsData, error: groupsError } = await supabase
+        .from('groups')
+        .select('*')
+        .in('id', groupIds);
+
+      if (groupsError) {
+        console.error('Error fetching groups:', groupsError);
+        throw groupsError;
+      }
+
+      console.log('Groups data:', groupsData);
+
+      // Combine the data
+      const groupsWithRoles = (groupsData || []).map(group => {
+        const membership = memberData.find(m => m.group_id === group.id);
+        return {
+          ...group,
+          member_role: membership?.role || 'member',
+          unread_count: 0 // TODO: Calculate unread messages
+        };
+      });
+
+      console.log('Final groups:', groupsWithRoles);
+      setGroups(groupsWithRoles);
     } catch (error) {
       console.error('Error fetching groups:', error);
       toast({
