@@ -11,11 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -66,9 +68,10 @@ const Auth = () => {
         throw error;
       }
 
+      setMessage("Please check your email to verify your account before signing in.");
       toast({
         title: "Account created!",
-        description: "You can now start creating pins and boards.",
+        description: "Please check your email to verify your account.",
       });
       
     } catch (error: any) {
@@ -107,6 +110,37 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const redirectUrl = `${window.location.origin}/auth`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setMessage("Check your email for a password reset link.");
+      toast({
+        title: "Reset email sent!",
+        description: "Check your email for a password reset link.",
+      });
+      
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      setError(error.message || "An error occurred while sending reset email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-soft-gray px-4">
       <div className="w-full max-w-md">
@@ -120,19 +154,21 @@ const Auth = () => {
           />
             </div>
             <CardTitle className="text-2xl">
-              {isSignUp ? "Join PinBoard" : "Welcome back"}
+              {isForgotPassword ? "Reset Password" : (isSignUp ? "Join PinBoard" : "Welcome back")}
             </CardTitle>
             <CardDescription>
-              {isSignUp 
-                ? "Create an account to start saving your favorite pins"
-                : "Sign in to your account"
-              }
+              {isForgotPassword 
+                ? "Enter your email to receive a reset link"
+                : (isSignUp 
+                  ? "Create an account to start saving your favorite pins"
+                  : "Sign in to your account"
+                )}
             </CardDescription>
           </CardHeader>
           
           <CardContent>
-            <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
-              {isSignUp && (
+            <form onSubmit={isForgotPassword ? handleForgotPassword : (isSignUp ? handleSignUp : handleSignIn)} className="space-y-4">
+              {isSignUp && !isForgotPassword && (
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
                   <Input
@@ -160,22 +196,30 @@ const Auth = () => {
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="rounded-xl"
-                />
-              </div>
+              {!isForgotPassword && (
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+              )}
 
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {message && (
+                <Alert>
+                  <AlertDescription>{message}</AlertDescription>
                 </Alert>
               )}
 
@@ -184,27 +228,48 @@ const Auth = () => {
                 className="w-full rounded-xl"
                 disabled={loading}
               >
-                {loading ? "Loading..." : (isSignUp ? "Create Account" : "Sign In")}
+                {loading ? "Loading..." : (isForgotPassword ? "Send Reset Link" : (isSignUp ? "Create Account" : "Sign In"))}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setError("");
-                  setEmail("");
-                  setPassword("");
-                  setFullName("");
-                }}
-                className="text-sm text-primary hover:underline"
-              >
-                {isSignUp 
-                  ? "Already have an account? Sign in" 
-                  : "Don't have an account? Sign up"
-                }
-              </button>
+            <div className="mt-6 text-center space-y-2">
+              {!isForgotPassword && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(!isSignUp);
+                    setError("");
+                    setMessage("");
+                    setEmail("");
+                    setPassword("");
+                    setFullName("");
+                  }}
+                  className="text-sm text-primary hover:underline block w-full"
+                >
+                  {isSignUp 
+                    ? "Already have an account? Sign in" 
+                    : "Don't have an account? Sign up"
+                  }
+                </button>
+              )}
+              
+              {!isSignUp && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsForgotPassword(!isForgotPassword);
+                    setError("");
+                    setMessage("");
+                    setPassword("");
+                  }}
+                  className="text-sm text-primary hover:underline block w-full"
+                >
+                  {isForgotPassword 
+                    ? "Back to sign in" 
+                    : "Forgot your password?"
+                  }
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>
