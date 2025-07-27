@@ -113,7 +113,11 @@ const Auth = () => {
         <Card className="shadow-card">
           <CardHeader className="text-center">
             <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-foreground font-bold text-2xl">P</span>
+              <img 
+            src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
+            alt="PinBoard Logo" 
+            className="w-8 h-8"
+          />
             </div>
             <CardTitle className="text-2xl">
               {isSignUp ? "Join PinBoard" : "Welcome back"}
