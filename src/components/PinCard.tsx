@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { MoreVertical, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SavePinDialog from "./SavePinDialog";
+import ImageActions from "./ImageActions";
 
 interface Pin {
   id: string;
@@ -87,6 +88,11 @@ const PinCard = ({ pin, onClick, className }: PinCardProps) => {
               >
                 Save
               </Button>
+              <ImageActions 
+                imageUrl={pin.image_url} 
+                title={pin.title}
+                className="bg-white/90 backdrop-blur-sm rounded-full p-1"
+              />
               <Button
                 variant="ghost"
                 size="sm"

@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plus, Settings } from "lucide-react";
 import Header from "@/components/Header";
 import PinGrid from "@/components/PinGrid";
-import ProfilePictureUpload from "@/components/ProfilePictureUpload";
+import NewProfilePictureUpload from "@/components/NewProfilePictureUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -228,7 +228,7 @@ const Profile = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="text-center mb-8">
-          <ProfilePictureUpload
+          <NewProfilePictureUpload
             currentAvatarUrl={userProfile?.avatar_url}
             userEmail={session.user.email || ''}
             userId={session.user.id}

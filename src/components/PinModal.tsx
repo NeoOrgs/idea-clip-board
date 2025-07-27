@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle, Share, MoreVertical, User } from "lucide-react";
+import ImageActions from "./ImageActions";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -209,9 +210,12 @@ const PinModal = ({ pin, isOpen, onClose }: PinModalProps) => {
                   >
                     Save
                   </Button>
-                  <Button variant="ghost" size="sm" className="rounded-full hover-scale">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <ImageActions imageUrl={pin.image_url} title={pin.title} />
+                    <Button variant="ghost" size="sm" className="rounded-full hover-scale">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="flex items-center space-x-3 mb-3">
