@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Plus, User, LogOut, Download } from "lucide-react";
+import { Search, Plus, User, LogOut, Download, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
@@ -142,6 +142,15 @@ const Header = () => {
           {user ? (
             <>
               <ThemeToggle />
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate("/groups")}
+                className="rounded-full"
+              >
+                <Users className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Groups</span>
+              </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
