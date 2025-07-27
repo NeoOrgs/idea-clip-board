@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { BotProtectionWrapper } from "@/components/BotProtectionWrapper";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -22,18 +23,20 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/reset-pass" element={<ResetPassword />} />
-            <Route path="/create-pin" element={<CreatePin />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/user/:userId" element={<UserProfile />} />
-            <Route path="/board/:boardId" element={<Board />} />
-            <Route path="/pin/:pinId" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <BotProtectionWrapper>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/reset-pass" element={<ResetPassword />} />
+              <Route path="/create-pin" element={<CreatePin />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/user/:userId" element={<UserProfile />} />
+              <Route path="/board/:boardId" element={<Board />} />
+              <Route path="/pin/:pinId" element={<Index />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BotProtectionWrapper>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

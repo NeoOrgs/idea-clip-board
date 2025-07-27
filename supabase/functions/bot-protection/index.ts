@@ -63,7 +63,7 @@ serve(async (req) => {
             mode: 'LIVE',
             characteristics: ['ip'],
             window: '1m',
-            max: 60
+            max: 100
           }
         ]
       })
