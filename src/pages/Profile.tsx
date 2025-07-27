@@ -204,9 +204,6 @@ const Profile = () => {
     }
   };
 
-  const handlePinClick = (pin: Pin) => {
-    navigate(`/pin/${pin.id}`);
-  };
 
   if (!session) {
     return <div>Loading...</div>;
@@ -237,10 +234,10 @@ const Profile = () => {
             userId={session.user.id}
             onAvatarUpdate={(newUrl) => setUserProfile({...userProfile, avatar_url: newUrl})}
           />
-          <h1 className="text-3xl font-bold mb-2 mt-4">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2 mt-4">
             {userProfile?.full_name || session.user.email}
           </h1>
-          <div className="flex items-center justify-center space-x-6 text-muted-foreground">
+          <div className="flex items-center justify-center space-x-4 md:space-x-6 text-muted-foreground text-sm md:text-base">
             <span>{userPins.length} pins</span>
             <span>{boards.length} boards</span>
             <span>{followersCount} followers</span>
@@ -330,26 +327,26 @@ const Profile = () => {
                 </Button>
               </Card>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
                 {boards.map((board) => (
                   <Card 
                     key={board.id} 
-                    className="cursor-pointer hover:shadow-card transition-shadow duration-200"
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 group"
                     onClick={() => navigate(`/board/${board.id}`)}
                   >
-                    <div className="aspect-square bg-muted rounded-t-lg flex items-center justify-center">
+                    <div className="aspect-square bg-muted rounded-t-lg flex items-center justify-center overflow-hidden">
                       {board.cover_image_url ? (
                         <img 
                           src={board.cover_image_url} 
                           alt={board.name}
-                          className="w-full h-full object-cover rounded-t-lg"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                         />
                       ) : (
-                        <span className="text-4xl">📌</span>
+                        <span className="text-3xl md:text-4xl">📌</span>
                       )}
                     </div>
-                    <CardContent className="p-3">
-                      <h3 className="font-medium text-sm line-clamp-2 mb-1">
+                    <CardContent className="p-2 md:p-3">
+                      <h3 className="font-medium text-xs md:text-sm line-clamp-2 mb-1">
                         {board.name}
                       </h3>
                       <p className="text-xs text-muted-foreground">
@@ -389,7 +386,7 @@ const Profile = () => {
                 </Button>
               </Card>
             ) : (
-              <PinGrid pins={userPins} onPinClick={handlePinClick} />
+              <PinGrid pins={userPins} />
             )}
           </div>
         </div>

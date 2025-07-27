@@ -112,17 +112,17 @@ const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div 
-          className="flex items-center space-x-2 cursor-pointer" 
+          className="flex items-center space-x-2 cursor-pointer flex-shrink-0" 
           onClick={() => navigate("/")}
         >
           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-lg">P</span>
           </div>
-          <span className="text-xl font-bold">PinBoard</span>
+          <span className="text-lg md:text-xl font-bold hidden sm:block">PinBoard</span>
         </div>
 
         {/* Search Bar (centered) */}
-        <div className="flex-1 max-w-2xl mx-8">
+        <div className="flex-1 max-w-2xl mx-4 md:mx-8">
           <form onSubmit={handleSearch} className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
@@ -136,7 +136,7 @@ const Header = () => {
         </div>
 
         {/* User Actions */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
           {user ? (
             <>
               <ThemeToggle />
@@ -146,8 +146,8 @@ const Header = () => {
                 onClick={() => navigate("/create-pin")}
                 className="rounded-full"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Create
+                <Plus className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Create</span>
               </Button>
               
               <DropdownMenu>
@@ -186,15 +186,19 @@ const Header = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate("/auth")}
-                className="rounded-full"
+                className="rounded-full text-sm"
+                size="sm"
               >
-                Log in
+                <span className="hidden md:inline">Log in</span>
+                <span className="md:hidden">Login</span>
               </Button>
               <Button 
                 onClick={() => navigate("/auth")}
-                className="rounded-full"
+                className="rounded-full text-sm"
+                size="sm"
               >
-                Sign up
+                <span className="hidden md:inline">Sign up</span>
+                <span className="md:hidden">Join</span>
               </Button>
             </div>
           )}

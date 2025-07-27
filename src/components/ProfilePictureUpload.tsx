@@ -99,6 +99,11 @@ const ProfilePictureUpload = ({
     }
 
     uploadAvatar(file);
+    
+    // Reset the input value to allow selecting the same file again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (

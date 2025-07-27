@@ -250,21 +250,21 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 md:py-8">
         {/* Profile Header */}
         <div className="text-center mb-8">
-          <Avatar className="w-24 h-24 mx-auto mb-4">
+          <Avatar className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4">
             <AvatarImage src={userProfile.avatar_url} alt={userProfile.full_name || userProfile.email} />
-            <AvatarFallback className="text-2xl font-bold">
+            <AvatarFallback className="text-xl md:text-2xl font-bold">
               {(userProfile.full_name || userProfile.email).charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">
             {userProfile.full_name || userProfile.email}
           </h1>
           
-          <div className="flex items-center justify-center space-x-6 mb-4 text-sm text-muted-foreground">
+          <div className="flex items-center justify-center space-x-4 md:space-x-6 mb-4 text-sm md:text-base text-muted-foreground">
             <span>{userPins.length} pins</span>
             <span>{boards.length} boards</span>
             <span>{followersCount} followers</span>

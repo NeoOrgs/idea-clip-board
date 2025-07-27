@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import CreatePin from "./pages/CreatePin";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
+import Board from "./pages/Board";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/create-pin" element={<CreatePin />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/user/:userId" element={<UserProfile />} />
+            <Route path="/board/:boardId" element={<Board />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
