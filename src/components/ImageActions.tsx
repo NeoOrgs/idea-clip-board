@@ -77,7 +77,7 @@ const ImageActions = ({ imageUrl, title, className = "" }: ImageActionsProps) =>
         )}
       </Button>
       
-      <DropdownMenu>
+{/*       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -97,7 +97,7 @@ const ImageActions = ({ imageUrl, title, className = "" }: ImageActionsProps) =>
             Open in New Tab
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
     </div>
   );
 };
