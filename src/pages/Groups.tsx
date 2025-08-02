@@ -43,7 +43,11 @@ const Groups = () => {
   const checkAuth = async () => {
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) throw error;
+      if (error) {
+        console.error('Auth error:', error);
+        navigate('/auth');
+        return;
+      }
       
       if (!user) {
         navigate('/auth');
