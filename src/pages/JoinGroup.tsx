@@ -65,6 +65,7 @@ const JoinGroup = () => {
   };
 
   const fetchInviteDetails = async () => {
+    console.log('Fetching invite details for code:', inviteCode);
     try {
       // First get the invite
       const { data: inviteData, error: inviteError } = await supabase
@@ -134,8 +135,10 @@ const JoinGroup = () => {
         .single();
 
       setAlreadyMember(!!memberData);
+      console.log('Invite fetch successful:', data);
     } catch (error) {
       console.error('Error fetching invite:', error);
+      console.log('Invite code being searched:', inviteCode);
       toast({
         title: 'Error',
         description: 'Failed to load invite details',
