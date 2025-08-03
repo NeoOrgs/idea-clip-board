@@ -66,19 +66,17 @@ const JoinGroup = () => {
 
   const fetchInviteDetails = async () => {
     try {
-      const { data, error } = await supabase
+      // First get the invite
+      const { data: inviteData, error: inviteError } = await supabase
         .from('group_invites')
-        .select(`
-          *,
-          groups!inner(*)
-        `)
+        .select('*')
         .eq('invite_code', inviteCode)
         .eq('is_active', true)
         .single();
 
-      if (error) throw error;
+      if (inviteError) throw inviteError;
 
-      if (!data) {
+      if (!inviteData) {
         toast({
           title: 'Invalid Invite',
           description: 'This invite link is not valid or has expired.',
@@ -87,6 +85,21 @@ const JoinGroup = () => {
         navigate('/');
         return;
       }
+
+      // Then get the group details
+      const { data: groupData, error: groupError } = await supabase
+        .from('groups')
+        .select('*')
+        .eq('id', inviteData.group_id)
+        .single();
+
+      if (groupError) throw groupError;
+
+      // Combine the data
+      const data = {
+        ...inviteData,
+        groups: groupData
+      };
 
       // Check if invite is expired
       if (data.expires_at && new Date(data.expires_at) < new Date()) {
