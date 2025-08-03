@@ -78,12 +78,12 @@ const JoinGroup = () => {
       if (inviteError) throw inviteError;
 
       if (!inviteData) {
+        console.log('No invite data found for code:', inviteCode);
         toast({
           title: 'Invalid Invite',
           description: 'This invite link is not valid or has expired.',
           variant: 'destructive',
         });
-        navigate('/');
         return;
       }
 
@@ -104,23 +104,23 @@ const JoinGroup = () => {
 
       // Check if invite is expired
       if (data.expires_at && new Date(data.expires_at) < new Date()) {
+        console.log('Invite expired:', data.expires_at);
         toast({
           title: 'Invite Expired',
           description: 'This invite link has expired.',
           variant: 'destructive',
         });
-        navigate('/');
         return;
       }
 
       // Check if max uses reached
       if (data.max_uses && data.usage_count >= data.max_uses) {
+        console.log('Invite max uses reached:', data.usage_count, '/', data.max_uses);
         toast({
           title: 'Invite Full',
           description: 'This invite link has reached its maximum number of uses.',
           variant: 'destructive',
         });
-        navigate('/');
         return;
       }
 
@@ -144,7 +144,7 @@ const JoinGroup = () => {
         description: 'Failed to load invite details',
         variant: 'destructive',
       });
-      navigate('/');
+      return;
     } finally {
       setLoading(false);
     }
