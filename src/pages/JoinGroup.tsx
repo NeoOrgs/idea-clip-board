@@ -73,7 +73,7 @@ const JoinGroup = () => {
         .select('*')
         .eq('invite_code', inviteCode)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (inviteError) throw inviteError;
 
@@ -92,7 +92,7 @@ const JoinGroup = () => {
         .from('groups')
         .select('*')
         .eq('id', inviteData.group_id)
-        .single();
+        .maybeSingle();
 
       if (groupError) throw groupError;
 
@@ -132,7 +132,7 @@ const JoinGroup = () => {
         .select('id')
         .eq('group_id', data.groups.id)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       setAlreadyMember(!!memberData);
       console.log('Invite fetch successful:', data);

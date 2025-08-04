@@ -62,6 +62,7 @@ export const GroupChatView = ({ group, onOpenSettings, onOpenInvite }: GroupChat
           filter: `group_id=eq.${group.id}`,
         },
         (payload) => {
+          console.log('New message received:', payload);
           // Fetch the new message with profile data
           fetchMessageWithProfile(payload.new.id);
         }
