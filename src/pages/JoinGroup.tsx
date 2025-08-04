@@ -26,6 +26,7 @@ interface GroupInvite {
 }
 
 const JoinGroup = () => {
+  console.log('=== JOINGROUP COMPONENT MOUNTING ===');
   const [invite, setInvite] = useState<GroupInvite | null>(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
@@ -34,6 +35,8 @@ const JoinGroup = () => {
   const { inviteCode } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  console.log('InviteCode from params:', inviteCode);
 
   useEffect(() => {
     checkAuth();
@@ -46,6 +49,7 @@ const JoinGroup = () => {
   }, [inviteCode, user]);
 
   const checkAuth = async () => {
+    console.log('=== CHECKING AUTH ===');
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error) throw error;
@@ -65,7 +69,9 @@ const JoinGroup = () => {
   };
 
   const fetchInviteDetails = async () => {
-    console.log('Fetching invite details for code:', inviteCode);
+    console.log('=== FETCHING INVITE DETAILS ===');
+    console.log('Invite code from URL:', inviteCode);
+    console.log('Current user:', user?.id);
     try {
       // First get the invite
       const { data: inviteData, error: inviteError } = await supabase
