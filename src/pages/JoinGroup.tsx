@@ -32,6 +32,7 @@ const JoinGroup = () => {
   const [joining, setJoining] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [alreadyMember, setAlreadyMember] = useState(false);
+  const [renderError, setRenderError] = useState<string | null>(null);
   const { inviteCode } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -78,6 +79,7 @@ const JoinGroup = () => {
     console.log('Current user:', user?.id);
     try {
       // First get the invite
+      console.log('Fetching invite data...');
       const { data: inviteData, error: inviteError } = await supabase
         .from('group_invites')
         .select('*')
@@ -85,10 +87,12 @@ const JoinGroup = () => {
         .eq('is_active', true)
         .maybeSingle();
 
+      console.log('Invite query result:', { inviteData, inviteError });
       if (inviteError) throw inviteError;
 
       if (!inviteData) {
         console.log('No invite data found for code:', inviteCode);
+        setLoading(false);
         toast({
           title: 'Invalid Invite',
           description: 'This invite link is not valid or has expired.',
@@ -98,19 +102,34 @@ const JoinGroup = () => {
       }
 
       // Then get the group details
+      console.log('Fetching group data for ID:', inviteData.group_id);
       const { data: groupData, error: groupError } = await supabase
         .from('groups')
         .select('*')
         .eq('id', inviteData.group_id)
         .maybeSingle();
 
+      console.log('Group query result:', { groupData, groupError });
       if (groupError) throw groupError;
+
+      if (!groupData) {
+        console.log('No group data found for ID:', inviteData.group_id);
+        setLoading(false);
+        toast({
+          title: 'Group Not Found',
+          description: 'The group associated with this invite could not be found.',
+          variant: 'destructive',
+        });
+        return;
+      }
 
       // Combine the data
       const data = {
         ...inviteData,
         groups: groupData
       };
+      
+      console.log('Combined invite and group data:', data);
 
       // Check if invite is expired
       if (data.expires_at && new Date(data.expires_at) < new Date()) {
@@ -243,100 +262,134 @@ const JoinGroup = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="container mx-auto p-4 flex items-center justify-center min-h-[60vh]">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Users className="h-5 w-5" />
-              Join Group
-            </CardTitle>
-            <CardDescription>
-              You've been invited to join a group chat
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            {/* Group Info */}
-            <div className="text-center space-y-4">
-              <Avatar className="h-20 w-20 mx-auto">
-                <AvatarImage src={invite.groups.avatar_url} />
-                <AvatarFallback className="text-lg">
-                  {invite.groups.name.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div>
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <h3 className="text-xl font-semibold">{invite.groups.name}</h3>
-                  <Badge variant={invite.groups.is_private ? 'secondary' : 'outline'}>
-                    {invite.groups.is_private ? (
-                      <>
-                        <Lock className="h-3 w-3 mr-1" />
-                        Private
-                      </>
-                    ) : (
-                      <>
-                        <Globe className="h-3 w-3 mr-1" />
-                        Public
-                      </>
-                    )}
-                  </Badge>
-                </div>
-                
-                {invite.groups.description && (
-                  <p className="text-muted-foreground">{invite.groups.description}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Invite Details */}
-            <div className="space-y-2 text-sm text-muted-foreground">
-              {invite.expires_at && (
-                <p>
-                  Expires: {new Date(invite.expires_at).toLocaleDateString()} at{' '}
-                  {new Date(invite.expires_at).toLocaleTimeString()}
-                </p>
-              )}
-              
-              {invite.max_uses && (
-                <p>
-                  Uses: {invite.usage_count} / {invite.max_uses}
-                </p>
-              )}
-            </div>
-
-            {/* Action Button */}
-            {alreadyMember ? (
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center gap-2 text-green-600">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>You're already a member of this group</span>
-                </div>
-                <Button onClick={() => navigate(`/groups/${invite.groups.id}`)} className="w-full">
-                  Go to Group
-                </Button>
-              </div>
-            ) : (
-              <Button onClick={joinGroup} disabled={joining} className="w-full">
-                {joining ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Joining...
-                  </>
-                ) : (
-                  'Join Group'
-                )}
+  // Add error boundary
+  if (renderError) {
+    console.log('=== RENDER ERROR ===', renderError);
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto p-4 flex items-center justify-center min-h-[60vh]">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6 text-center">
+              <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+              <h2 className="text-xl font-semibold mb-2">Error</h2>
+              <p className="text-muted-foreground mb-4">
+                Something went wrong: {renderError}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Reload Page
               </Button>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  try {
+    console.log('=== RENDERING MAIN CONTENT ===');
+    console.log('Invite data:', invite);
+    console.log('Groups data:', invite?.groups);
+    
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        
+        <div className="container mx-auto p-4 flex items-center justify-center min-h-[60vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <CardTitle className="flex items-center justify-center gap-2">
+                <Users className="h-5 w-5" />
+                Join Group
+              </CardTitle>
+              <CardDescription>
+                You've been invited to join a group chat
+              </CardDescription>
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              {/* Group Info */}
+              <div className="text-center space-y-4">
+                <Avatar className="h-20 w-20 mx-auto">
+                  <AvatarImage src={invite?.groups?.avatar_url} />
+                  <AvatarFallback className="text-lg">
+                    {invite?.groups?.name ? invite.groups.name.slice(0, 2).toUpperCase() : 'GR'}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div>
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <h3 className="text-xl font-semibold">{invite?.groups?.name || 'Unknown Group'}</h3>
+                    <Badge variant={invite?.groups?.is_private ? 'secondary' : 'outline'}>
+                      {invite?.groups?.is_private ? (
+                        <>
+                          <Lock className="h-3 w-3 mr-1" />
+                          Private
+                        </>
+                      ) : (
+                        <>
+                          <Globe className="h-3 w-3 mr-1" />
+                          Public
+                        </>
+                      )}
+                    </Badge>
+                  </div>
+                  
+                  {invite?.groups?.description && (
+                    <p className="text-muted-foreground">{invite.groups.description}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Invite Details */}
+              <div className="space-y-2 text-sm text-muted-foreground">
+                {invite?.expires_at && (
+                  <p>
+                    Expires: {new Date(invite.expires_at).toLocaleDateString()} at{' '}
+                    {new Date(invite.expires_at).toLocaleTimeString()}
+                  </p>
+                )}
+                
+                {invite?.max_uses && (
+                  <p>
+                    Uses: {invite.usage_count} / {invite.max_uses}
+                  </p>
+                )}
+              </div>
+
+              {/* Action Button */}
+              {alreadyMember ? (
+                <div className="text-center space-y-4">
+                  <div className="flex items-center justify-center gap-2 text-green-600">
+                    <CheckCircle className="h-5 w-5" />
+                    <span>You're already a member of this group</span>
+                  </div>
+                  <Button onClick={() => navigate(`/groups/${invite?.groups?.id}`)} className="w-full">
+                    Go to Group
+                  </Button>
+                </div>
+              ) : (
+                <Button onClick={joinGroup} disabled={joining} className="w-full">
+                  {joining ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Joining...
+                    </>
+                  ) : (
+                    'Join Group'
+                  )}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  } catch (error) {
+    console.error('Render error:', error);
+    setRenderError(error instanceof Error ? error.message : 'Unknown render error');
+    return null;
+  }
 };
 
 export default JoinGroup;
