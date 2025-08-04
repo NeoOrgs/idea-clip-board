@@ -52,15 +52,19 @@ const JoinGroup = () => {
     console.log('=== CHECKING AUTH ===');
     try {
       const { data: { user }, error } = await supabase.auth.getUser();
+      console.log('Auth result - user:', user, 'error:', error);
+      
       if (error) throw error;
       
       if (!user) {
+        console.log('No user found, storing invite and redirecting to auth');
         // Store the invite code and redirect to auth
         localStorage.setItem('pendingInvite', inviteCode || '');
         navigate('/auth');
         return;
       }
       
+      console.log('User authenticated, setting user state');
       setUser(user);
     } catch (error) {
       console.error('Auth error:', error);
@@ -200,6 +204,7 @@ const JoinGroup = () => {
   };
 
   if (loading) {
+    console.log('=== RENDERING LOADING STATE ===');
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -207,6 +212,9 @@ const JoinGroup = () => {
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
             <p>Loading invite details...</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Debug: InviteCode = {inviteCode}, User = {user?.id || 'None'}
+            </p>
           </div>
         </div>
       </div>
