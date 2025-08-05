@@ -248,6 +248,10 @@ const PinModal = ({ pin, isOpen, onClose, pinId }: PinModalProps) => {
                 onLike={toggleLike}
                 onSave={() => setShowSaveDialog(true)}
                 onClose={handleClose}
+                onPinDeleted={() => {
+                  handleClose();
+                  // Optionally navigate away or refresh data
+                }}
               />
               
               <PinModalComments

@@ -3,6 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Heart, MessageCircle, Share, Download, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import ImageActions from "@/components/ImageActions";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 interface Pin {
   id: string;
@@ -24,11 +27,21 @@ interface PinModalHeaderProps {
   onLike: () => void;
   onSave: () => void;
   onClose: () => void;
+  onPinDeleted?: () => void;
 }
 
-const PinModalHeader = ({ pin, isLiked, likesCount, onLike, onSave, onClose }: PinModalHeaderProps) => {
+const PinModalHeader = ({ pin, isLiked, likesCount, onLike, onSave, onClose, onPinDeleted }: PinModalHeaderProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUserId(session?.user?.id || null);
+    };
+    getCurrentUser();
+  }, []);
 
   const handleShare = async () => {
     try {
@@ -90,14 +103,14 @@ const PinModalHeader = ({ pin, isLiked, likesCount, onLike, onSave, onClose }: P
           >
             <Share className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleDownload}
-            className="rounded-full hover:bg-muted"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
+          <ImageActions 
+            imageUrl={pin.image_url} 
+            title={pin.title}
+            pinId={pin.id}
+            userId={pin.user_id}
+            currentUserId={currentUserId || undefined}
+            onDelete={onPinDeleted}
+          />
           <Button
             onClick={onSave}
             className="rounded-full px-6"
