@@ -1,47 +1,60 @@
-// Utility functions for responsive image loading
+// Utility functions for ping-based image rendering
 
-type NetworkSpeed = 'fast' | 'medium' | 'slow';
-type ImageQuality = 'low' | 'medium' | 'high';
+export type NetworkSpeed = 'fast' | 'medium' | 'slow';
+export type ImageResolution = '144p' | '240p' | '360p' | '480p' | '720p' | 'original';
 
-export const getOptimalImageQuality = (networkSpeed: NetworkSpeed): ImageQuality => {
+export interface ResolutionConfig {
+  width: number;
+  height: number;
+  quality: number;
+}
+
+export const RESOLUTION_CONFIGS: Record<ImageResolution, ResolutionConfig> = {
+  '144p': { width: 256, height: 144, quality: 40 },
+  '240p': { width: 426, height: 240, quality: 50 },
+  '360p': { width: 640, height: 360, quality: 60 },
+  '480p': { width: 854, height: 480, quality: 70 },
+  '720p': { width: 1280, height: 720, quality: 80 },
+  'original': { width: 0, height: 0, quality: 90 } // 0 means no resize
+};
+
+export const getResolutionForNetworkSpeed = (networkSpeed: NetworkSpeed): ImageResolution => {
   switch (networkSpeed) {
-    case 'fast':
-      return 'high';
-    case 'medium':
-      return 'medium';
     case 'slow':
-      return 'low';
+      return '144p';
+    case 'medium':
+      return '240p';
+    case 'fast':
+      return '360p';
     default:
-      return 'medium';
+      return '240p';
   }
 };
 
-export const getResponsiveImageUrl = (
+export const getImageUrlWithResolution = (
   originalUrl: string, 
-  quality: ImageQuality = 'medium',
+  resolution: ImageResolution,
   networkSpeed?: NetworkSpeed
 ): string => {
-  // If network speed is provided, override quality
-  const finalQuality = networkSpeed ? getOptimalImageQuality(networkSpeed) : quality;
+  // If network speed is provided, use appropriate resolution
+  const finalResolution = networkSpeed ? getResolutionForNetworkSpeed(networkSpeed) : resolution;
   
   // If it's a Supabase storage URL, we can add transformation parameters
   if (originalUrl.includes('.supabase.co/storage/')) {
     const url = new URL(originalUrl);
+    const config = RESOLUTION_CONFIGS[finalResolution];
     
-    switch (finalQuality) {
-      case 'low':
-        url.searchParams.set('width', '300');
-        url.searchParams.set('quality', '50');
-        break;
-      case 'medium':
-        url.searchParams.set('width', '600');
-        url.searchParams.set('quality', '70');
-        break;
-      case 'high':
-        // Remove any existing resize parameters for full quality
-        url.searchParams.delete('width');
-        url.searchParams.delete('quality');
-        break;
+    if (finalResolution !== 'original') {
+      url.searchParams.set('width', config.width.toString());
+      url.searchParams.set('height', config.height.toString());
+      url.searchParams.set('quality', config.quality.toString());
+      url.searchParams.set('resize', 'contain');
+    } else {
+      // Remove any existing resize parameters for original quality
+      url.searchParams.delete('width');
+      url.searchParams.delete('height');
+      url.searchParams.delete('quality');
+      url.searchParams.delete('resize');
     }
     
     return url.toString();
@@ -49,6 +62,13 @@ export const getResponsiveImageUrl = (
   
   // For external URLs, return as-is since we can't control their resolution
   return originalUrl;
+};
+
+export const getResponsiveImageUrl = (
+  originalUrl: string, 
+  networkSpeed?: NetworkSpeed
+): string => {
+  return getImageUrlWithResolution(originalUrl, '240p', networkSpeed);
 };
 
 export const preloadImage = (src: string): Promise<HTMLImageElement> => {

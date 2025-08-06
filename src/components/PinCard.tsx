@@ -2,12 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { gsapAnimations } from "@/hooks/useGSAP";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SavePinDialog from "./SavePinDialog";
 import ImageActions from "./ImageActions";
-import { getResponsiveImageUrl, preloadImage } from "@/utils/imageUtils";
-import { useNetworkSpeed } from "@/hooks/useNetworkSpeed";
+import { useMultiResolutionImage } from "@/hooks/useMultiResolutionImage";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Pin {
@@ -34,16 +33,27 @@ interface PinCardProps {
 }
 
 const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCardProps) => {
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [isHighQualityLoaded, setIsHighQualityLoaded] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
   const [statsLoaded, setStatsLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { networkSpeed } = useNetworkSpeed();
+  
+  const {
+    currentImageUrl,
+    isImageLoading,
+    imageError,
+    networkSpeed,
+    handleImageLoad,
+    handleImageError,
+    handleHover,
+    loadMaxResolution,
+    isMaxResolution
+  } = useMultiResolutionImage({ 
+    originalUrl: pin.image_url, 
+    preloadOnHover: true 
+  });
 
   useEffect(() => {
     if (cardRef.current) {
@@ -52,21 +62,12 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
     }
   }, []);
 
-  // Preload higher quality image and fetch stats on hover
+  // Fetch stats on hover
   useEffect(() => {
-    if (isHovered && !isHighQualityLoaded && networkSpeed === 'fast') {
-      const highQualityUrl = getResponsiveImageUrl(pin.image_url, 'high');
-      preloadImage(highQualityUrl)
-        .then(() => setIsHighQualityLoaded(true))
-        .catch(() => {
-          // Silently fail, keep showing current quality image
-        });
-    }
-    
     if (isHovered && !statsLoaded) {
       fetchPinStats();
     }
-  }, [isHovered, pin.image_url, isHighQualityLoaded, statsLoaded, networkSpeed]);
+  }, [isHovered, statsLoaded]);
 
   const fetchPinStats = async () => {
     try {
@@ -94,11 +95,19 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
     onPinDeleted?.(pin.id);
   };
 
-  // Get initial image quality based on network speed
-  const initialImageUrl = getResponsiveImageUrl(pin.image_url, 'medium', networkSpeed);
-  const displayImageUrl = isHighQualityLoaded 
-    ? getResponsiveImageUrl(pin.image_url, 'high') 
-    : initialImageUrl;
+  // Handle hover with preloading
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    handleHover();
+  };
+
+  // Handle click to load max resolution and then navigate
+  const handleCardClick = () => {
+    if (!isMaxResolution) {
+      loadMaxResolution();
+    }
+    onClick?.();
+  };
 
   return (
     <Card 
@@ -107,8 +116,8 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
         "group relative overflow-hidden rounded-2xl cursor-pointer pin-card bg-gradient-card",
         className
       )}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
+      onClick={handleCardClick}
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative">
@@ -116,18 +125,15 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
         <div className="relative overflow-hidden rounded-xl">
           {!imageError ? (
             <img
-              src={displayImageUrl}
+              src={currentImageUrl}
               alt={pin.title}
               className={cn(
                 "w-full h-auto object-cover transition-all duration-300",
-                isImageLoaded ? "opacity-100" : "opacity-0",
+                !isImageLoading ? "opacity-100" : "opacity-0",
                 isHovered && "scale-105"
               )}
-              onLoad={() => setIsImageLoaded(true)}
-              onError={() => {
-                setImageError(true);
-                setIsImageLoaded(true);
-              }}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
               loading="lazy"
             />
           ) : (
@@ -137,8 +143,15 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
           )}
           
           {/* Loading skeleton */}
-          {!isImageLoaded && !imageError && (
+          {isImageLoading && !imageError && (
             <div className="absolute inset-0 bg-muted animate-pulse rounded-lg" />
+          )}
+
+          {/* Network speed indicator */}
+          {networkSpeed && (
+            <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm rounded-full px-2 py-1 text-white text-xs">
+              {networkSpeed} • {isMaxResolution ? 'Original' : 'Optimized'}
+            </div>
           )}
         </div>
 
