@@ -130,12 +130,12 @@ const ImageActions = ({
           size="sm"
           onClick={handleDownload}
           disabled={downloading}
-          className="rounded-full hover-scale bg-white/90 hover:bg-white text-foreground dark:bg-background/90 dark:hover:bg-background shadow-lg"
+          className="rounded-full hover-scale bg-white/90 hover:bg-white text-foreground dark:bg-background/90 dark:hover:bg-background shadow-lg h-8 w-8 sm:h-10 sm:w-10"
         >
           {downloading ? (
-            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
           ) : (
-            <Download className="h-4 w-4" />
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
           )}
         </Button>
         
@@ -145,9 +145,9 @@ const ImageActions = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="rounded-full hover-scale bg-white/90 hover:bg-white text-foreground dark:bg-background/90 dark:hover:bg-background shadow-lg"
+                className="rounded-full hover-scale bg-white/90 hover:bg-white text-foreground dark:bg-background/90 dark:hover:bg-background shadow-lg h-8 w-8 sm:h-10 sm:w-10"
               >
-                <MoreVertical className="h-4 w-4" />
+                <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="animate-fade-in">

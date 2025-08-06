@@ -80,28 +80,28 @@ const PinModalHeader = ({ pin, isLiked, likesCount, onLike, onSave, onClose, onP
   };
 
   return (
-    <div className="p-6 border-b bg-card">
+    <div className="p-3 sm:p-6 border-b bg-card flex-shrink-0">
       {/* Top actions */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between mb-3 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="rounded-full hover:bg-muted"
+            className="rounded-full hover:bg-muted h-8 w-8 sm:h-10 sm:w-10"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleShare}
-            className="rounded-full hover:bg-muted"
+            className="rounded-full hover:bg-muted h-8 w-8 sm:h-10 sm:w-10"
           >
-            <Share className="h-4 w-4" />
+            <Share className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
           <ImageActions 
             imageUrl={pin.image_url} 
@@ -110,10 +110,11 @@ const PinModalHeader = ({ pin, isLiked, likesCount, onLike, onSave, onClose, onP
             userId={pin.user_id}
             currentUserId={currentUserId || undefined}
             onDelete={onPinDeleted}
+            className="flex"
           />
           <Button
             onClick={onSave}
-            className="rounded-full px-6"
+            className="rounded-full px-3 sm:px-6 text-xs sm:text-sm h-8 sm:h-10"
           >
             Save
           </Button>
@@ -121,47 +122,47 @@ const PinModalHeader = ({ pin, isLiked, likesCount, onLike, onSave, onClose, onP
       </div>
 
       {/* Pin info */}
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold leading-tight">{pin.title}</h1>
+      <div className="space-y-2 sm:space-y-4">
+        <h1 className="text-lg sm:text-2xl font-bold leading-tight">{pin.title}</h1>
         
         {pin.description && (
-          <p className="text-muted-foreground leading-relaxed">{pin.description}</p>
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{pin.description}</p>
         )}
 
         {/* User info */}
         <div 
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
           onClick={() => navigate(`/user/${pin.user_id}`)}
         >
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
             <AvatarImage src={pin.profiles?.avatar_url} />
             <AvatarFallback>
               {(pin.profiles?.full_name || pin.profiles?.email || 'U').charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="font-medium group-hover:text-primary transition-colors">
+          <span className="text-sm sm:text-base font-medium group-hover:text-primary transition-colors">
             {pin.profiles?.full_name || pin.profiles?.email || 'Anonymous'}
           </span>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between pt-1 sm:pt-2">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={onLike}
-              className="flex items-center gap-2 rounded-full"
+              className="flex items-center gap-1 sm:gap-2 rounded-full h-8 sm:h-9 px-2 sm:px-3"
             >
-              <Heart className={`h-5 w-5 transition-all ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-              {likesCount > 0 && <span>{likesCount}</span>}
+              <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-all ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              {likesCount > 0 && <span className="text-xs sm:text-sm">{likesCount}</span>}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              className="flex items-center gap-2 rounded-full"
+              className="flex items-center gap-1 sm:gap-2 rounded-full h-8 sm:h-9 px-2 sm:px-3"
             >
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
         </div>
