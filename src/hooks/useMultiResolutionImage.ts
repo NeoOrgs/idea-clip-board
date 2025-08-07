@@ -14,6 +14,14 @@ export const useMultiResolutionImage = ({ originalUrl, preloadOnHover = false }:
   const [imageError, setImageError] = useState(false);
   const [preloadedHighRes, setPreloadedHighRes] = useState(false);
 
+  // Debug logging
+  console.log('🔍 Multi-resolution image debug:', {
+    originalUrl,
+    networkSpeed,
+    networkLoading,
+    currentResolution
+  });
+
   // Get the appropriate resolution based on network speed
   useEffect(() => {
     if (!networkLoading && networkSpeed) {
@@ -25,6 +33,14 @@ export const useMultiResolutionImage = ({ originalUrl, preloadOnHover = false }:
   // Get the current image URL based on resolution
   const currentImageUrl = getImageUrlWithResolution(originalUrl, currentResolution);
   const originalImageUrl = getImageUrlWithResolution(originalUrl, 'original');
+
+  // Debug logging for URLs
+  console.log('🖼️ Image URLs:', {
+    originalUrl,
+    currentImageUrl,
+    originalImageUrl,
+    currentResolution
+  });
 
   const handleImageLoad = () => {
     setIsImageLoading(false);

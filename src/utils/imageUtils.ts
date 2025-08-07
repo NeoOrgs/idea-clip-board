@@ -39,6 +39,14 @@ export const getImageUrlWithResolution = (
   // If network speed is provided, use appropriate resolution
   const finalResolution = networkSpeed ? getResolutionForNetworkSpeed(networkSpeed) : resolution;
   
+  console.log('🔧 URL transformation:', {
+    originalUrl,
+    resolution,
+    networkSpeed,
+    finalResolution,
+    isSupabaseUrl: originalUrl.includes('.supabase.co/storage/')
+  });
+  
   // If it's a Supabase storage URL, we can add transformation parameters
   if (originalUrl.includes('.supabase.co/storage/')) {
     const url = new URL(originalUrl);
