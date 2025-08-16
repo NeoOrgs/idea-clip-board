@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Search, Heart } from "lucide-react";
 
 interface Pin {
   id: string;
@@ -117,97 +116,53 @@ const Home = () => {
 
   if (!session) {
     return (
-      <div className="min-h-screen gradient-warm">
+      <div className="min-h-screen">
         <Header />
-        <main className="container-premium section-spacing">
+        <main className="container mx-auto px-4 py-8">
           {/* Hero Section */}
-          <div className="text-center max-w-6xl mx-auto relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-3xl blur-3xl -z-10"></div>
-            
-            <div className="mb-10 animate-bounce-subtle">
-              <span className="inline-flex items-center px-6 py-3 rounded-full glass-card text-primary text-sm font-semibold mb-8 hover-lift">
-                <span className="animate-pulse mr-2">✨</span>
-                Discover & Save Ideas
+          <div className="text-center py-20 max-w-5xl mx-auto">
+            <div className="mb-8">
+              <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+                ✨ Discover & Save Ideas
               </span>
             </div>
-            
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-black mb-10 text-gradient leading-tight tracking-tight animate-float-slow">
-              Save ideas
-              <br />
-              <span className="text-glow">you love</span>
+            <h1 className="text-6xl md:text-7xl font-bold mb-8 text-gradient leading-tight">
+              Save ideas you love
             </h1>
-            
-            <p className="text-xl md:text-2xl lg:text-3xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto font-medium">
-              Collect your favorites so you can get back to them later. Create 
-              <span className="text-foreground font-semibold"> beautiful boards </span>
-              to organize your pins by theme and inspiration.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-3xl mx-auto">
+              Collect your favorites so you can get back to them later. Create beautiful boards to organize your pins by theme and inspiration.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                variant="premium"
-                size="xl"
+                size="lg"
                 onClick={() => navigate("/auth")}
-                className="min-w-[200px] font-bold shadow-glow"
+                className="rounded-full px-10 py-6 text-lg font-semibold btn-modern shadow-card hover:shadow-hover"
               >
                 Get Started Free
               </Button>
               <Button 
-                variant="glass"
-                size="xl" 
+                variant="outline"
+                size="lg" 
                 onClick={() => navigate("/auth")}
-                className="min-w-[200px] font-bold"
+                className="rounded-full px-10 py-6 text-lg font-semibold border-2 hover:bg-accent/50"
               >
                 Sign In
               </Button>
-            </div>
-
-            {/* Feature highlights */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-              <div className="glass-card p-8 rounded-3xl hover-lift">
-                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <Plus className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Easy to Save</h3>
-                <p className="text-muted-foreground">Save any idea from the web with our browser extension or by uploading directly</p>
-              </div>
-              
-              <div className="glass-card p-8 rounded-3xl hover-lift">
-                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <Search className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Smart Search</h3>
-                <p className="text-muted-foreground">Find your saved pins instantly with our powerful search and organization tools</p>
-              </div>
-              
-              <div className="glass-card p-8 rounded-3xl hover-lift">
-                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <Heart className="w-8 h-8 text-primary-foreground" />
-                </div>
-                <h3 className="text-xl font-bold mb-4">Get Inspired</h3>
-                <p className="text-muted-foreground">Discover millions of ideas and connect with a creative community worldwide</p>
-              </div>
             </div>
           </div>
 
           {/* Sample pins for logged out users */}
           {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="text-center">
-                <div className="relative">
-                  <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-6"></div>
-                  <div className="absolute inset-0 w-16 h-16 border-2 border-primary/10 rounded-full animate-pulse mx-auto"></div>
-                </div>
-                <p className="text-muted-foreground font-medium">Loading inspiration...</p>
-              </div>
+            <div className="flex justify-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
           ) : (
             <div className="mb-8">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 text-gradient">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gradient">
                   Discover inspiring ideas
                 </h2>
-                <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-medium leading-relaxed">
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                   Explore beautiful pins from our community and get inspired for your next project
                 </p>
               </div>
@@ -233,35 +188,26 @@ const Home = () => {
   return (
     <div className="min-h-screen gradient-warm">
       <Header />
-      <main className="py-12">
+      <main className="py-8">
         {searchQuery && (
-          <div className="container-premium mb-10">
-            <div className="glass-card p-6 rounded-2xl">
-              <h2 className="text-2xl font-bold mb-2">Search results for "{searchQuery}"</h2>
-              <p className="text-muted-foreground text-lg">
-                <span className="font-semibold text-primary">{pins.length}</span> pins found
-              </p>
-            </div>
+          <div className="container mx-auto px-4 mb-6">
+            <h2 className="text-xl font-semibold">Search results for "{searchQuery}"</h2>
+            <p className="text-muted-foreground">{pins.length} pins found</p>
           </div>
         )}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex items-center justify-center py-16">
             <div className="text-center">
-              <div className="relative mb-6">
-                <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto"></div>
-                <div className="absolute inset-0 w-16 h-16 border-2 border-primary/10 rounded-full animate-ping mx-auto"></div>
-              </div>
-              <p className="text-muted-foreground font-medium text-lg">Loading your pins...</p>
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading pins...</p>
             </div>
           </div>
         ) : (
-          <div className="container-premium">
-            <PinGrid 
-              pins={pins} 
-              currentUserId={session?.user?.id}
-              onPinDeleted={handlePinDeleted}
-            />
-          </div>
+          <PinGrid 
+            pins={pins} 
+            currentUserId={session?.user?.id}
+            onPinDeleted={handlePinDeleted}
+          />
         )}
         
         {pinId && (

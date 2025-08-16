@@ -108,31 +108,31 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full glass-hero border-b border-border/20">
-      <div className="container-premium h-18 flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <div 
-          className="flex items-center space-x-3 cursor-pointer flex-shrink-0 hover-magnetic rounded-xl p-2" 
+          className="flex items-center space-x-2 cursor-pointer flex-shrink-0" 
           onClick={() => navigate("/")}
         >
           <img 
             src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
             alt="PinBoard Logo" 
-            className="w-10 h-10 hover:scale-110 transition-transform duration-300"
+            className="w-8 h-8"
           />
-          <span className="text-xl md:text-2xl font-bold hidden sm:block text-gradient">PinBoard</span>
+          <span className="text-lg md:text-xl font-bold hidden sm:block">PinBoard</span>
         </div>
 
         {/* Search Bar (centered) */}
-        <div className="flex-1 max-w-3xl mx-6 md:mx-10">
-          <form onSubmit={handleSearch} className="relative group">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
+        <div className="flex-1 max-w-2xl mx-4 md:mx-8">
+          <form onSubmit={handleSearch} className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search for inspiring pins..."
+              placeholder="Search for pins..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 pl-12 pr-6 rounded-2xl border-2 border-border bg-background/80 backdrop-blur-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 hover:border-primary/20 transition-all duration-300 shadow-soft hover:shadow-card"
+              className="w-full h-10 pl-10 pr-4 rounded-full border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
             />
           </form>
         </div>
@@ -142,11 +142,20 @@ const Header = () => {
           {user ? (
             <>
               <ThemeToggle />
+{/*               <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate("/groups")}
+                className="rounded-full"
+              >
+                <Users className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Groups</span>
+              </Button> */}
               <Button 
-                variant="glass" 
+                variant="ghost" 
                 size="sm"
                 onClick={() => navigate("/create-pin")}
-                className="rounded-2xl font-semibold"
+                className="rounded-full"
               >
                 <Plus className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Create</span>
@@ -154,10 +163,10 @@ const Header = () => {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:scale-110 transition-transform duration-300">
-                    <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors duration-300">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={userProfile?.avatar_url || ""} alt={userProfile?.full_name || user.email || ""} />
-                      <AvatarFallback className="text-sm font-semibold bg-gradient-primary text-primary-foreground">
+                      <AvatarFallback>
                         {(userProfile?.full_name || user.email || '').charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -183,21 +192,20 @@ const Header = () => {
               </DropdownMenu>
             </>
           ) : (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <ThemeToggle />
               <Button 
-                variant="glass" 
+                variant="outline" 
                 onClick={() => navigate("/auth")}
-                className="rounded-2xl text-sm font-semibold"
+                className="rounded-full text-sm"
                 size="sm"
               >
                 <span className="hidden md:inline">Log in</span>
                 <span className="md:hidden">Login</span>
               </Button>
               <Button 
-                variant="premium"
                 onClick={() => navigate("/auth")}
-                className="rounded-2xl text-sm font-semibold"
+                className="rounded-full text-sm"
                 size="sm"
               >
                 <span className="hidden md:inline">Sign up</span>

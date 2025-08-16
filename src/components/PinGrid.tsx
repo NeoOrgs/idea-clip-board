@@ -61,28 +61,28 @@ const PinGrid = ({ pins, onPinClick, className, currentUserId, onPinDeleted }: P
 
   if (pins.length === 0) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-16">
         <div className="text-center">
-          <div className="w-20 h-20 gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-6 animate-bounce-subtle">
-            <span className="text-3xl">📌</span>
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">📌</span>
           </div>
-          <h3 className="text-2xl font-bold mb-3 text-gradient">No pins yet</h3>
-          <p className="text-muted-foreground text-lg font-medium">Start creating pins to see them here!</p>
+          <h3 className="text-lg font-medium mb-2">No pins yet</h3>
+          <p className="text-muted-foreground">Start creating pins to see them here!</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn("w-full px-4", className)}>
       <div 
-        className="grid gap-6 lg:gap-8"
+        className="grid gap-4"
         style={{ 
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
         }}
       >
         {columnArrays.map((columnPins, columnIndex) => (
-          <div key={columnIndex} className="space-y-6 lg:space-y-8">
+          <div key={columnIndex} className="space-y-4">
             {columnPins.map((pin) => (
               <PinCard
                 key={pin.id}
@@ -91,7 +91,7 @@ const PinGrid = ({ pins, onPinClick, className, currentUserId, onPinDeleted }: P
                   navigate(`/pin/${pin.id}`);
                   onPinClick?.(pin);
                 }}
-                className="w-full pin-card-premium"
+                className="w-full"
                 currentUserId={currentUserId}
                 onPinDeleted={onPinDeleted}
               />
