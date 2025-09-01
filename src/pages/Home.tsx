@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import PinGrid from "@/components/PinGrid";
 import PinModal from "@/components/PinModal";
+import ParticleMorphism from "@/components/ParticleMorphism";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -116,57 +117,89 @@ const Home = () => {
 
   if (!session) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen relative overflow-hidden">
+        <ParticleMorphism particleCount={800} mouseInteraction={true} />
         <Header />
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 relative z-10">
           {/* Hero Section */}
-          <div className="text-center py-20 max-w-5xl mx-auto">
-            <div className="mb-8">
-              <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+          <div className="text-center py-20 max-w-6xl mx-auto">
+            <div className="mb-8 animate-fade-in">
+              <span className="inline-block px-6 py-3 rounded-full glass-morphism text-primary text-sm font-medium mb-8 floating-card">
                 ✨ Discover & Save Ideas
               </span>
             </div>
-            <h1 className="text-6xl md:text-7xl font-bold mb-8 text-gradient leading-tight">
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 aurora-text leading-tight animate-scale-in">
               Save ideas you love
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-3xl mx-auto">
-              Collect your favorites so you can get back to them later. Create beautiful boards to organize your pins by theme and inspiration.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-4xl mx-auto animate-fade-in">
+              Collect your favorites so you can get back to them later. Create beautiful boards to organize your pins by theme and inspiration with our award-winning interface.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center animate-slide-in-right">
               <Button 
+                variant="premium"
                 size="lg"
                 onClick={() => navigate("/auth")}
-                className="rounded-full px-10 py-6 text-lg font-semibold btn-modern shadow-card hover:shadow-hover"
+                className="rounded-full px-12 py-8 text-xl font-semibold shadow-glow"
               >
                 Get Started Free
               </Button>
               <Button 
-                variant="outline"
+                variant="glass"
                 size="lg" 
                 onClick={() => navigate("/auth")}
-                className="rounded-full px-10 py-6 text-lg font-semibold border-2 hover:bg-accent/50"
+                className="rounded-full px-12 py-8 text-xl font-semibold"
               >
                 Sign In
               </Button>
             </div>
           </div>
 
+          {/* Features Grid */}
+          <div className="premium-grid mb-16 max-w-7xl mx-auto">
+            <div className="glass-morphism p-8 rounded-2xl floating-card text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🎨</span>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Creative Collections</h3>
+              <p className="text-muted-foreground">Organize your ideas into beautiful, themed boards</p>
+            </div>
+            <div className="glass-morphism p-8 rounded-2xl floating-card text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">⚡</span>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Lightning Fast</h3>
+              <p className="text-muted-foreground">Save and access your pins instantly</p>
+            </div>
+            <div className="glass-morphism p-8 rounded-2xl floating-card text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🌟</span>
+              </div>
+              <h3 className="text-xl font-bold mb-3">Award-Winning Design</h3>
+              <p className="text-muted-foreground">Beautiful, modern interface with 3D interactions</p>
+            </div>
+          </div>
+
           {/* Sample pins for logged out users */}
           {loading ? (
-            <div className="flex justify-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <div className="flex justify-center py-20">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
+                <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border border-primary/30"></div>
+              </div>
             </div>
           ) : (
             <div className="mb-8">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gradient">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 aurora-text">
                   Discover inspiring ideas
                 </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                   Explore beautiful pins from our community and get inspired for your next project
                 </p>
               </div>
-              <PinGrid pins={pins.slice(0, 12)} currentUserId={session?.user?.id} />
+              <div className="glass-morphism rounded-3xl p-8">
+                <PinGrid pins={pins.slice(0, 12)} currentUserId={session?.user?.id} />
+              </div>
               {pinId && (
                 <PinModal
                   pin={null}
@@ -186,28 +219,39 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-warm">
+    <div className="min-h-screen relative overflow-hidden">
+      <ParticleMorphism particleCount={600} mouseInteraction={true} />
+      <div className="gradient-warm absolute inset-0 opacity-50 -z-10" />
       <Header />
-      <main className="py-8">
+      <main className="py-8 relative z-10">
         {searchQuery && (
-          <div className="container mx-auto px-4 mb-6">
-            <h2 className="text-xl font-semibold">Search results for "{searchQuery}"</h2>
-            <p className="text-muted-foreground">{pins.length} pins found</p>
+          <div className="container mx-auto px-4 mb-8">
+            <div className="glass-morphism p-6 rounded-2xl">
+              <h2 className="text-2xl font-bold aurora-text">Search results for "{searchQuery}"</h2>
+              <p className="text-muted-foreground text-lg">{pins.length} pins found</p>
+            </div>
           </div>
         )}
         {loading ? (
-          <div className="flex items-center justify-center py-16">
+          <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading pins...</p>
+              <div className="relative">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                <div className="absolute inset-0 w-12 h-12 border border-primary/30 rounded-full animate-ping mx-auto"></div>
+              </div>
+              <p className="text-muted-foreground text-lg">Loading your amazing pins...</p>
             </div>
           </div>
         ) : (
-          <PinGrid 
-            pins={pins} 
-            currentUserId={session?.user?.id}
-            onPinDeleted={handlePinDeleted}
-          />
+          <div className="container mx-auto px-4">
+            <div className="glass-morphism rounded-3xl p-8">
+              <PinGrid 
+                pins={pins} 
+                currentUserId={session?.user?.id}
+                onPinDeleted={handlePinDeleted}
+              />
+            </div>
+          </div>
         )}
         
         {pinId && (
