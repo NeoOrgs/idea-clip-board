@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import PinGrid from "@/components/PinGrid";
 import PinModal from "@/components/PinModal";
+import NetworkIndicator from "@/components/NetworkIndicator";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
@@ -189,6 +190,13 @@ const Home = () => {
     <div className="min-h-screen gradient-warm">
       <Header />
       <main className="py-8">
+        {/* Network Status Indicator (Dev Mode) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="container mx-auto px-4 mb-4">
+            <NetworkIndicator showDetails className="max-w-xs" />
+          </div>
+        )}
+        
         {searchQuery && (
           <div className="container mx-auto px-4 mb-6">
             <h2 className="text-xl font-semibold">Search results for "{searchQuery}"</h2>
