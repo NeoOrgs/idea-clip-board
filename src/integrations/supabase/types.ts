@@ -189,7 +189,13 @@ export type Database = {
           created_at: string
           group_id: string
           id: string
+          image_url: string | null
+          link_description: string | null
+          link_image_url: string | null
+          link_title: string | null
+          link_url: string | null
           message_type: string | null
+          platform: string | null
           updated_at: string
           user_id: string
         }
@@ -198,7 +204,13 @@ export type Database = {
           created_at?: string
           group_id: string
           id?: string
+          image_url?: string | null
+          link_description?: string | null
+          link_image_url?: string | null
+          link_title?: string | null
+          link_url?: string | null
           message_type?: string | null
+          platform?: string | null
           updated_at?: string
           user_id: string
         }
@@ -207,7 +219,13 @@ export type Database = {
           created_at?: string
           group_id?: string
           id?: string
+          image_url?: string | null
+          link_description?: string | null
+          link_image_url?: string | null
+          link_title?: string | null
+          link_url?: string | null
           message_type?: string | null
+          platform?: string | null
           updated_at?: string
           user_id?: string
         }
