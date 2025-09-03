@@ -6,9 +6,7 @@ import { MoreVertical, Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SavePinDialog from "./SavePinDialog";
 import ImageActions from "./ImageActions";
-import { getLegacyResponsiveImageUrl, preloadImage } from "@/utils/imageUtils";
-import { useNetwork } from "@/contexts/NetworkContext";
-import NetworkImage from "./NetworkImage";
+import { preloadImage } from "@/utils/imageUtils";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Pin {
@@ -44,7 +42,7 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
   const [commentsCount, setCommentsCount] = useState(0);
   const [statsLoaded, setStatsLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { speed: networkSpeed, quality } = useNetwork();
+  
 
   useEffect(() => {
     if (cardRef.current) {
@@ -53,21 +51,12 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
     }
   }, []);
 
-  // Preload higher quality image and fetch stats on hover
+  // Fetch stats on hover
   useEffect(() => {
-    if (isHovered && !isHighQualityLoaded && networkSpeed === 'fast') {
-      const highQualityUrl = getLegacyResponsiveImageUrl(pin.image_url, 'high');
-      preloadImage(highQualityUrl)
-        .then(() => setIsHighQualityLoaded(true))
-        .catch(() => {
-          // Silently fail, keep showing current quality image
-        });
-    }
-    
     if (isHovered && !statsLoaded) {
       fetchPinStats();
     }
-  }, [isHovered, pin.image_url, isHighQualityLoaded, statsLoaded, networkSpeed]);
+  }, [isHovered, statsLoaded]);
 
   const fetchPinStats = async () => {
     try {
@@ -109,13 +98,12 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative">
-        {/* Enhanced Network-Based Image */}
+        {/* Standard Image */}
         <div className="relative overflow-hidden rounded-xl">
           {!imageError ? (
-            <NetworkImage
+            <img
               src={pin.image_url}
               alt={pin.title}
-              width={400}
               className={cn(
                 "w-full h-auto object-cover transition-all duration-300",
                 isHovered && "scale-105"
@@ -125,7 +113,7 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
                 setImageError(true);
                 setIsImageLoaded(true);
               }}
-              placeholder="blur"
+              loading="lazy"
             />
           ) : (
             <div className="w-full h-48 bg-muted flex items-center justify-center rounded-lg">
