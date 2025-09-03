@@ -118,10 +118,9 @@ const Home = () => {
 
 
   if (!session) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
+  return (
+    <div className="min-h-screen">
+      <main className="container mx-auto px-4 py-8">
           {/* Hero Section */}
           <div className="text-center py-12 px-4 max-w-5xl mx-auto">
             <div className="mb-6">
@@ -194,7 +193,6 @@ const Home = () => {
 
   return (
     <div className="min-h-screen gradient-warm">
-      <Header />
       <main className="py-8">
         {/* Network Status Indicator (Dev Mode) */}
         {process.env.NODE_ENV === 'development' && (
