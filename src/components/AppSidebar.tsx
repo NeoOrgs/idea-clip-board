@@ -23,7 +23,7 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ user, userProfile }: AppSidebarProps) {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile, setOpen } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -83,10 +83,8 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
               size="icon"
               className="lg:hidden h-8 w-8"
               onClick={() => {
-                const sidebar = document.querySelector('[data-sidebar]');
-                if (sidebar) {
-                  sidebar.removeAttribute('data-state');
-                }
+                if (isMobile) setOpenMobile(false);
+                else setOpen(false);
               }}
             >
               ×

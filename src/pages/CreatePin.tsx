@@ -32,7 +32,7 @@ const CreatePin = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isNsfw, setIsNsfw] = useState(true);
+  const [isNsfw, setIsNsfw] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
