@@ -19,6 +19,8 @@ import Board from "./pages/Board";
 import Groups from "./pages/Groups";
 import JoinGroup from "./pages/JoinGroup";
 import PinboardView from "./pages/PinboardView";
+import Followers from "./pages/Followers";
+import Following from "./pages/Following";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -112,6 +114,8 @@ const App = () => {
                       <Route path="/groups/:groupId" element={<Groups />} />
                       <Route path="/join/:inviteCode" element={<JoinGroup />} />
                       <Route path="/pinboard" element={<PinboardView />} />
+                      <Route path="/followers" element={<Followers />} />
+                      <Route path="/following" element={<Following />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   {/* </BotProtectionWrapper> */}

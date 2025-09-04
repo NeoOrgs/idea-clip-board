@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Users, User, LogOut } from "lucide-react";
+import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
@@ -33,6 +33,8 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
     { title: "Home", url: "/", icon: Home },
     { title: "Create Pin", url: "/create-pin", icon: Plus },
     { title: "Groups", url: "/groups", icon: Users },
+    { title: "Followers", url: "/followers", icon: UserCheck },
+    { title: "Following", url: "/following", icon: UserPlus },
     { title: "Profile", url: "/profile", icon: User },
   ];
 
