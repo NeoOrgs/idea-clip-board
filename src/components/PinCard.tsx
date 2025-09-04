@@ -18,6 +18,7 @@ interface Pin {
   user_id: string;
   board_id: string;
   created_at: string;
+  is_nsfw?: boolean;
   profiles?: {
     full_name?: string;
     email: string;
@@ -41,6 +42,7 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
   const [likesCount, setLikesCount] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
   const [statsLoaded, setStatsLoaded] = useState(false);
+  const [showNsfwContent, setShowNsfwContent] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   
 
@@ -101,20 +103,48 @@ const PinCard = ({ pin, onClick, className, currentUserId, onPinDeleted }: PinCa
         {/* Standard Image */}
         <div className="relative overflow-hidden rounded-xl">
           {!imageError ? (
-            <img
-              src={pin.image_url}
-              alt={pin.title}
-              className={cn(
-                "w-full h-auto object-cover transition-all duration-300",
-                isHovered && "scale-105"
+            <div className="relative">
+              <img
+                src={pin.image_url}
+                alt={pin.title}
+                className={cn(
+                  "w-full h-auto object-cover transition-all duration-300",
+                  isHovered && "scale-105",
+                  pin.is_nsfw && !showNsfwContent && "blur-md"
+                )}
+                onLoad={() => setIsImageLoaded(true)}
+                onError={() => {
+                  setImageError(true);
+                  setIsImageLoaded(true);
+                }}
+                loading="lazy"
+              />
+              
+              {/* NSFW Overlay */}
+              {pin.is_nsfw && !showNsfwContent && (
+                <div 
+                  className="absolute inset-0 bg-black/50 flex items-center justify-center cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowNsfwContent(true);
+                  }}
+                >
+                  <div className="bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
+                    <p className="text-sm font-medium text-gray-900">NSFW Content</p>
+                    <p className="text-xs text-gray-600 mt-1">Click to view</p>
+                  </div>
+                </div>
               )}
-              onLoad={() => setIsImageLoaded(true)}
-              onError={() => {
-                setImageError(true);
-                setIsImageLoaded(true);
-              }}
-              loading="lazy"
-            />
+              
+              {/* NSFW Tag */}
+              {pin.is_nsfw && (
+                <div className="absolute top-2 left-2">
+                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                    NSFW
+                  </span>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="w-full h-48 bg-muted flex items-center justify-center rounded-lg">
               <span className="text-muted-foreground text-sm">Failed to load image</span>

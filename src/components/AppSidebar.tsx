@@ -66,15 +66,31 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
       <SidebarContent className="flex flex-col h-full">
         {/* Header */}
         <div className="p-4 border-b">
-          <div className="flex items-center gap-3">
-            <img 
-              src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
-              alt="PinBoard Logo" 
-              className="w-8 h-8 flex-shrink-0"
-            />
-            {!isCollapsed && (
-              <span className="text-lg font-bold">PinBoard</span>
-            )}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img 
+                src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
+                alt="PinBoard Logo" 
+                className="w-8 h-8 flex-shrink-0"
+              />
+              {!isCollapsed && (
+                <span className="text-lg font-bold">PinBoard</span>
+              )}
+            </div>
+            {/* Close button for mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden h-8 w-8"
+              onClick={() => {
+                const sidebar = document.querySelector('[data-sidebar]');
+                if (sidebar) {
+                  sidebar.removeAttribute('data-state');
+                }
+              }}
+            >
+              ×
+            </Button>
           </div>
         </div>
 

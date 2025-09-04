@@ -20,6 +20,7 @@ interface Pin {
   user_id: string;
   board_id: string;
   created_at: string;
+  is_nsfw?: boolean;
   profiles?: {
     full_name?: string;
     email: string;
