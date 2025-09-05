@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Bot, Send, Loader2, Sparkles, X, MessageCircle, Copy, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence, useSpring } from 'framer-motion';
 
 interface Message {
   id: string;
@@ -117,101 +118,261 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     });
   };
 
+  const buttonVariants = {
+    hidden: { scale: 0, opacity: 0 },
+    visible: { 
+      scale: 1, 
+      opacity: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 500,
+        damping: 20
+      }
+    },
+    hover: {
+      scale: 1.1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 400,
+        damping: 10
+      }
+    },
+    tap: {
+      scale: 0.95
+    }
+  };
+
+  const chatVariants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.8,
+      y: 20,
+      x: 20
+    },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      y: 0,
+      x: 0,
+      transition: {
+        type: "spring" as const,
+        stiffness: 300,
+        damping: 25,
+        staggerChildren: 0.1
+      }
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      y: 20,
+      x: 20,
+      transition: {
+        duration: 0.2
+      }
+    }
+  };
+
+  const messageVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 400,
+        damping: 25
+      }
+    }
+  };
+
   if (!isOpen) {
     return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className={cn(
-          "fixed bottom-6 right-6 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg transition-all duration-200 hover:scale-110",
-          className
-        )}
-        size="icon"
+      <motion.div
+        variants={buttonVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover="hover"
+        whileTap="tap"
+        className={cn("fixed bottom-6 right-6", className)}
       >
-        <Bot className="h-6 w-6" />
-      </Button>
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
+          size="icon"
+        >
+          <motion.div
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          >
+            <Bot className="h-6 w-6" />
+          </motion.div>
+        </Button>
+      </motion.div>
     );
   }
 
   return (
-    <Card className={cn("fixed bottom-6 right-6 w-96 h-[500px] shadow-xl border-0 bg-card/95 backdrop-blur-sm", className)}>
-      <CardContent className="p-0 h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-primary/5">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Bot className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm">AI Assistant</h3>
-              <p className="text-xs text-muted-foreground">Always ready to help</p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsOpen(false)}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Messages */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex gap-2",
-                  message.isUser ? "flex-row-reverse" : "flex-row"
-                )}
+    <AnimatePresence>
+      <motion.div
+        variants={chatVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className={cn("fixed bottom-6 right-6", className)}
+      >
+        <Card className="w-96 h-[500px] shadow-xl border-0 bg-card/95 backdrop-blur-sm">
+          <CardContent className="p-0 h-full flex flex-col">
+            {/* Enhanced Header */}
+            <motion.div 
+              className="flex items-center justify-between p-4 border-b bg-primary/5"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center"
+                  whileHover={{ scale: 1.1, rotate: 180 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Bot className="h-4 w-4 text-primary" />
+                </motion.div>
+                <div>
+                  <motion.h3 
+                    className="font-semibold text-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    AI Assistant
+                  </motion.h3>
+                  <motion.p 
+                    className="text-xs text-muted-foreground"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    Always ready to help
+                  </motion.p>
+                </div>
+              </div>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className={cn(
-                    "text-xs",
-                    message.isUser ? "bg-primary text-primary-foreground" : "bg-secondary"
-                  )}>
-                    {message.isUser ? "You" : <Bot className="h-4 w-4" />}
-                  </AvatarFallback>
-                </Avatar>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsOpen(false)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            </motion.div>
+
+        {/* Enhanced Messages */}
+        <ScrollArea className="flex-1 p-4">
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <AnimatePresence>
+              {messages.map((message, index) => (
+                <motion.div
+                  key={message.id}
+                  variants={messageVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  transition={{ delay: index * 0.1 }}
+                  className={cn(
+                    "flex gap-2",
+                    message.isUser ? "flex-row-reverse" : "flex-row"
+                  )}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className={cn(
+                        "text-xs",
+                        message.isUser ? "bg-primary text-primary-foreground" : "bg-secondary"
+                      )}>
+                        {message.isUser ? "You" : <Bot className="h-4 w-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+                  </motion.div>
                 
                 <div className={cn("flex flex-col", message.isUser ? "items-end" : "items-start")}>
-                  <div
+                  <motion.div
                     className={cn(
                       "max-w-[280px] rounded-lg p-3 text-sm",
                       message.isUser
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted"
                     )}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    <motion.p 
+                      className="whitespace-pre-wrap"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.1, duration: 0.5 }}
+                    >
+                      {message.content}
+                    </motion.p>
                     
-                    {/* Special UI for data responses */}
+                    {/* Enhanced Special UI for data responses */}
                     {message.data && (
-                      <div className="mt-3 pt-3 border-t border-border/20">
+                      <motion.div 
+                        className="mt-3 pt-3 border-t border-border/20"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        transition={{ delay: 0.3, duration: 0.4 }}
+                      >
                         {message.data.inviteLink && (
-                          <div className="space-y-2">
+                          <motion.div 
+                            className="space-y-2"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                          >
                             <Badge variant="secondary" className="text-xs">
                               <ExternalLink className="h-3 w-3 mr-1" />
                               Invite Link Created
                             </Badge>
                             <div className="flex items-center gap-2 p-2 bg-background/10 rounded text-xs">
                               <code className="flex-1 truncate">{message.data.inviteLink}</code>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-6 w-6 p-0"
-                                onClick={() => copyToClipboard(message.data.inviteLink)}
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
                               >
-                                <Copy className="h-3 w-3" />
-                              </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => copyToClipboard(message.data.inviteLink)}
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </motion.div>
                             </div>
-                          </div>
+                          </motion.div>
                         )}
                         
                         {message.data.group && (
-                          <div className="space-y-1">
+                          <motion.div 
+                            className="space-y-1"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.4 }}
+                          >
                             <Badge variant="secondary" className="text-xs">
                               <Sparkles className="h-3 w-3 mr-1" />
                               Group Created
@@ -219,62 +380,121 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                             <p className="text-xs opacity-90">
                               {message.data.group.name}
                             </p>
-                          </div>
+                          </motion.div>
                         )}
-                      </div>
+                      </motion.div>
                     )}
-                  </div>
+                  </motion.div>
                   
-                  <span className="text-xs text-muted-foreground mt-1">
+                  <motion.span 
+                    className="text-xs text-muted-foreground mt-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+                  </motion.span>
                 </div>
-              </div>
-            ))}
+              </motion.div>
+              ))}
+            </AnimatePresence>
             
             {isLoading && (
-              <div className="flex gap-2">
+              <motion.div 
+                className="flex gap-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-secondary">
                     <Bot className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <div className="bg-muted rounded-lg p-3">
+                <motion.div 
+                  className="bg-muted rounded-lg p-3"
+                  animate={{ scale: [1, 1.02, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Thinking...
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      <Loader2 className="h-4 w-4" />
+                    </motion.div>
+                    <motion.span
+                      animate={{ opacity: [1, 0.5, 1] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      Thinking...
+                    </motion.span>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
           <div ref={messagesEndRef} />
         </ScrollArea>
 
-        {/* Input */}
-        <div className="p-4 border-t">
+        {/* Enhanced Input */}
+        <motion.div 
+          className="p-4 border-t"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
           <div className="flex gap-2">
-            <Input
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ask me to create groups, generate content..."
+            <motion.div
               className="flex-1"
-              disabled={isLoading}
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!inputMessage.trim() || isLoading}
-              size="sm"
+              whileFocus={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
             >
-              <Send className="h-4 w-4" />
-            </Button>
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ask me to create groups, generate content..."
+                className="flex-1"
+                disabled={isLoading}
+              />
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim() || isLoading}
+                size="sm"
+              >
+                <motion.div
+                  animate={{ 
+                    x: isLoading ? [0, 2, 0] : 0,
+                    rotate: isLoading ? [0, 5, -5, 0] : 0
+                  }}
+                  transition={{ 
+                    duration: isLoading ? 0.5 : 0,
+                    repeat: isLoading ? Infinity : 0
+                  }}
+                >
+                  <Send className="h-4 w-4" />
+                </motion.div>
+              </Button>
+            </motion.div>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
+          <motion.p 
+            className="text-xs text-muted-foreground mt-2 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
             Try: "create a group named photography" or "make a template for travel blog"
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </CardContent>
     </Card>
+    </motion.div>
+  </AnimatePresence>
   );
 };
