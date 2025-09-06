@@ -1,5 +1,7 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus } from "lucide-react";
+import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus, Search } from "lucide-react";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
@@ -28,6 +30,7 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const currentPath = location.pathname;
+  const [searchQuery, setSearchQuery] = useState("");
 
   const mainItems = [
     { title: "Home", url: "/", icon: Home },
@@ -45,6 +48,17 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
     return currentPath === path || currentPath.startsWith(path + "/");
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/');
+    }
+    // Close sidebar on mobile after search
+    if (isMobile) setOpenMobile(false);
+  };
+
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -52,6 +66,8 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
       toast({
         title: "Signed out successfully",
       });
+      // Close sidebar on mobile after sign out
+      if (isMobile) setOpenMobile(false);
     } catch (error) {
       console.error('Sign out error:', error);
       toast({
@@ -94,6 +110,22 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
           </div>
         </div>
 
+        {/* Search Section */}
+        {user && !isCollapsed && (
+          <div className="p-4 border-b">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search pins..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 rounded-full"
+              />
+            </form>
+          </div>
+        )}
+
         {/* User Profile Section */}
         {user && (
           <div className="p-4 border-b">
@@ -128,7 +160,13 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url} className="flex items-center gap-3">
+                    <NavLink 
+                      to={item.url} 
+                      className="flex items-center gap-3"
+                      onClick={() => {
+                        if (isMobile) setOpenMobile(false);
+                      }}
+                    >
                       <item.icon className="h-5 w-5 flex-shrink-0" />
                       {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
