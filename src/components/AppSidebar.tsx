@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus, Search } from "lucide-react";
+import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus, Search, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,8 +31,10 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
   const { toast } = useToast();
   const currentPath = location.pathname;
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
-  const mainItems = [
+  // Different navigation items based on authentication status
+  const authenticatedItems = [
     { title: "Home", url: "/", icon: Home },
     { title: "Create Pin", url: "/create-pin", icon: Plus },
     { title: "Groups", url: "/groups", icon: Users },
@@ -40,6 +42,14 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
     { title: "Following", url: "/following", icon: UserPlus },
     { title: "Profile", url: "/profile", icon: User },
   ];
+
+  const unauthenticatedItems = [
+    { title: "Home", url: "/", icon: Home },
+    { title: "Search", url: "/#search", icon: Search, isSearchToggle: true },
+    { title: "LogIn", url: "/auth", icon: LogIn },
+  ];
+
+  const mainItems = user ? authenticatedItems : unauthenticatedItems;
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -111,7 +121,7 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
         </div>
 
         {/* Search Section */}
-        {user && !isCollapsed && (
+        {((user && !isCollapsed) || (!user && showSearch && !isCollapsed)) && (
           <div className="p-4 border-b">
             <form onSubmit={handleSearch} className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -159,17 +169,30 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
             <SidebarMenu className="space-y-1">
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink 
-                      to={item.url} 
-                      className="flex items-center gap-3"
-                      onClick={() => {
-                        if (isMobile) setOpenMobile(false);
-                      }}
-                    >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
+                  <SidebarMenuButton asChild={!(item as any).isSearchToggle} isActive={isActive(item.url)}>
+                    {(item as any).isSearchToggle ? (
+                      <button
+                        className="flex items-center gap-3 w-full"
+                        onClick={() => {
+                          setShowSearch(!showSearch);
+                          if (isMobile) setOpenMobile(false);
+                        }}
+                      >
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </button>
+                    ) : (
+                      <NavLink 
+                        to={item.url} 
+                        className="flex items-center gap-3"
+                        onClick={() => {
+                          if (isMobile) setOpenMobile(false);
+                        }}
+                      >
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        {!isCollapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
