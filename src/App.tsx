@@ -80,29 +80,27 @@ const App = () => {
           <BrowserRouter>
             <SidebarProvider>
               <div className="min-h-screen flex w-full">
-                {/* Mobile header with hamburger - only show for authenticated users */}
-                {user && (
-                  <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-background/95 backdrop-blur border-b lg:hidden">
-                    <div className="flex items-center justify-between px-4 h-full">
-                      <SidebarTrigger className="lg:hidden" />
-                      <div className="flex items-center gap-2">
-                        <img 
-                          src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
-                          alt="PinBoard Logo" 
-                          className="w-6 h-6"
-                        />
-                        <span className="font-bold text-lg">PinBoard</span>
-                      </div>
-                      <div className="w-8" /> {/* Spacer for centering */}
+                {/* Mobile header with hamburger */}
+                <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-background/95 backdrop-blur border-b lg:hidden">
+                  <div className="flex items-center justify-between px-4 h-full">
+                    <SidebarTrigger className="lg:hidden" />
+                    <div className="flex items-center gap-2">
+                      <img 
+                        src="/lovable-uploads/dd15324d-eb74-4e88-9e81-b3dac66be0a1.png" 
+                        alt="PinBoard Logo" 
+                        className="w-6 h-6"
+                      />
+                      <span className="font-bold text-lg">PinBoard</span>
                     </div>
-                  </header>
-                )}
+                    <div className="w-8" /> {/* Spacer for centering */}
+                  </div>
+                </header>
 
-                {/* Desktop Sidebar - only show for authenticated users */}
-                {user && <AppSidebar user={user} userProfile={userProfile} />}
+                {/* Desktop Sidebar */}
+                <AppSidebar user={user} userProfile={userProfile} />
                 
                 {/* Main Content */}
-                <main className={`flex-1 ${user ? 'lg:ml-0 pt-14 lg:pt-0' : ''}`}>
+                <main className="flex-1 lg:ml-0 pt-14 lg:pt-0">
                   {/* <BotProtectionWrapper> */}
                     <Routes>
                       <Route path="/" element={<Index />} />
@@ -125,8 +123,8 @@ const App = () => {
                 </main>
               </div>
               
-              {/* AI Assistant - Available on all pages for authenticated users */}
-              {user && <AIAssistant />}
+              {/* AI Assistant - Available on all pages */}
+              <AIAssistant />
             </SidebarProvider>
           </BrowserRouter>
         </TooltipProvider>
