@@ -253,28 +253,40 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
 
   // Initial assessment and periodic updates
   useEffect(() => {
+    let mounted = true;
+    
     const performInitialAssessment = async () => {
+      if (!mounted) return;
       const initialState = await assessNetworkQuality();
-      setNetworkState(initialState);
+      if (mounted) {
+        setNetworkState(initialState);
+      }
     };
 
     performInitialAssessment();
 
     // Reassess on network changes
-    const handleOnline = () => reassessNetwork();
-    const handleOffline = () => setNetworkState(prev => ({ ...prev, speed: 'offline', quality: 'minimal' }));
+    const handleOnline = () => {
+      if (mounted) reassessNetwork();
+    };
+    const handleOffline = () => {
+      if (mounted) {
+        setNetworkState(prev => ({ ...prev, speed: 'offline', quality: 'minimal' }));
+      }
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
     // Periodic reassessment every 2 minutes
     const interval = setInterval(() => {
-      if (Date.now() - networkState.lastAssessment > 120000) {
+      if (mounted && Date.now() - networkState.lastAssessment > 120000) {
         reassessNetwork();
       }
     }, 120000);
 
     return () => {
+      mounted = false;
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       clearInterval(interval);
@@ -298,7 +310,18 @@ export function NetworkProvider({ children }: { children: ReactNode }) {
 export function useNetwork() {
   const context = useContext(NetworkContext);
   if (context === undefined) {
-    throw new Error('useNetwork must be used within a NetworkProvider');
+    // Return default state instead of throwing error to prevent crashes
+    console.warn('useNetwork used outside NetworkProvider, returning default state');
+    return {
+      ...defaultState,
+      reassessNetwork: async () => {},
+      forceQuality: () => {},
+      getOptimalImageParams: (baseWidth: number) => ({
+        width: baseWidth,
+        quality: 75,
+        format: 'webp'
+      })
+    };
   }
   return context;
 }
