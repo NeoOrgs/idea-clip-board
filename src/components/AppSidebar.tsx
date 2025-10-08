@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus, Search, LogIn } from "lucide-react";
+import { Home, Plus, Users, User, LogOut, UserCheck, UserPlus, Search, LogIn, ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,6 +37,7 @@ export function AppSidebar({ user, userProfile }: AppSidebarProps) {
   const authenticatedItems = [
     { title: "Home", url: "/", icon: Home },
     { title: "Create Pin", url: "/create-pin", icon: Plus },
+    { title: "Image Editor", url: "/image-editor", icon: ImageIcon },
     { title: "Groups", url: "/groups", icon: Users },
     { title: "Followers", url: "/followers", icon: UserCheck },
     { title: "Following", url: "/following", icon: UserPlus },

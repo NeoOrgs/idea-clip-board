@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,15 @@ const CreatePin = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    // Check for imageUrl in query params (from image editor)
+    const urlParam = searchParams.get("imageUrl");
+    if (urlParam) {
+      setImageUrl(decodeURIComponent(urlParam));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Check authentication and redirect if not logged in

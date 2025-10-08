@@ -18,6 +18,22 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'playfair': ['"Playfair Display"', 'serif'],
+				'montserrat': ['Montserrat', 'sans-serif'],
+				'roboto': ['Roboto', 'sans-serif'],
+				'lato': ['Lato', 'sans-serif'],
+				'open-sans': ['"Open Sans"', 'sans-serif'],
+				'poppins': ['Poppins', 'sans-serif'],
+				'raleway': ['Raleway', 'sans-serif'],
+				'bebas': ['"Bebas Neue"', 'cursive'],
+				'dancing': ['"Dancing Script"', 'cursive'],
+				'pacifico': ['Pacifico', 'cursive'],
+				'lobster': ['Lobster', 'cursive'],
+				'caveat': ['Caveat', 'cursive'],
+				'oswald': ['Oswald', 'sans-serif'],
+				'merriweather': ['Merriweather', 'serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
