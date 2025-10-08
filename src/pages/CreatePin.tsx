@@ -28,7 +28,8 @@ const CreatePin = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [originalUrl, setOriginalUrl] = useState("");
   const [selectedBoard, setSelectedBoard] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -89,46 +90,56 @@ const CreatePin = () => {
     }
   };
 
-  const handleImageUpload = async (file: File) => {
+  const handleMultipleImageUpload = async (files: File[]) => {
     setIsUploading(true);
     setError("");
+    const uploadedUrls: string[] = [];
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `pins/${session?.user.id}/${fileName}`;
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `pins/${session?.user.id}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('pin-images')
-        .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+          .from('pin-images')
+          .upload(filePath, file);
 
-      if (uploadError) {
-        throw uploadError;
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('pin-images')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicUrl);
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('pin-images')
-        .getPublicUrl(filePath);
-
-      setImageUrl(publicUrl);
+      setImageUrls(uploadedUrls);
       toast({
-        title: "Image uploaded!",
-        description: "Your image has been uploaded successfully.",
+        title: "Images uploaded!",
+        description: `${uploadedUrls.length} image(s) uploaded successfully.`,
       });
     } catch (error: any) {
       console.error('Upload error:', error);
-      setError(error.message || "Failed to upload image");
+      setError(error.message || "Failed to upload images");
     } finally {
       setIsUploading(false);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      handleImageUpload(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setImageFiles(files);
+      handleMultipleImageUpload(files);
     }
+  };
+
+  const removeImage = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,35 +150,40 @@ const CreatePin = () => {
     setError("");
 
     try {
-      if (!title || !imageUrl || !selectedBoard) {
+      const imagesToUpload = imageUrls.length > 0 ? imageUrls : [imageUrl];
+      
+      if (!title || imagesToUpload.length === 0 || imagesToUpload[0] === "" || !selectedBoard) {
         throw new Error("Please fill in all required fields");
       }
 
+      // Create multiple pins for multiple images
+      const pinsToInsert = imagesToUpload.map(imgUrl => ({
+        title,
+        description,
+        image_url: imgUrl,
+        original_url: originalUrl || null,
+        board_id: selectedBoard,
+        user_id: session.user.id,
+        is_nsfw: isNsfw
+      }));
+
       const { error } = await supabase
         .from('pins')
-        .insert({
-          title,
-          description,
-          image_url: imageUrl,
-          original_url: originalUrl || null,
-          board_id: selectedBoard,
-          user_id: session.user.id,
-          is_nsfw: isNsfw
-        });
+        .insert(pinsToInsert);
 
       if (error) {
         throw error;
       }
 
       toast({
-        title: "Pin created!",
-        description: "Your pin has been saved successfully.",
+        title: `${pinsToInsert.length} Pin(s) created!`,
+        description: "Your pins have been saved successfully.",
       });
 
       navigate("/");
     } catch (error: any) {
       console.error('Error creating pin:', error);
-      setError(error.message || "Failed to create pin");
+      setError(error.message || "Failed to create pins");
     } finally {
       setLoading(false);
     }
@@ -207,15 +223,16 @@ const CreatePin = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Image Upload Section */}
               <div className="space-y-4">
-                <Label className="text-base font-medium">Image</Label>
+                <Label className="text-base font-medium">Images</Label>
                 
-                {!imageUrl ? (
+                {imageUrls.length === 0 && !imageUrl ? (
                   <div className="space-y-4">
                     {/* File Upload */}
                     <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-muted-foreground/40 transition-colors">
                       <input
                         type="file"
                         accept="image/*"
+                        multiple
                         onChange={handleFileChange}
                         className="hidden"
                         id="image-upload"
@@ -224,10 +241,10 @@ const CreatePin = () => {
                       <label htmlFor="image-upload" className="cursor-pointer">
                         <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                         <p className="text-lg font-medium mb-2">
-                          {isUploading ? "Uploading..." : "Choose a file"}
+                          {isUploading ? "Uploading..." : "Choose files"}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Or drag and drop an image here
+                          Select multiple images to upload to the same board
                         </p>
                       </label>
                     </div>
@@ -238,7 +255,7 @@ const CreatePin = () => {
                     <div className="space-y-2">
                       <Label htmlFor="imageUrl" className="flex items-center">
                         <Link className="h-4 w-4 mr-2" />
-                        Image URL
+                        Image URL (single image)
                       </Label>
                       <Input
                         id="imageUrl"
@@ -252,25 +269,57 @@ const CreatePin = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="relative">
-                      <img
-                        src={imageUrl}
-                        alt="Preview"
-                        className="w-full max-w-md mx-auto rounded-lg shadow-soft"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setImageUrl("");
-                          setImageFile(null);
-                        }}
-                        className="absolute top-2 right-2"
-                      >
-                        Change
-                      </Button>
-                    </div>
+                    {imageUrls.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-4">
+                        {imageUrls.map((url, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={url}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-48 object-cover rounded-lg shadow-soft"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeImage(index)}
+                              className="absolute top-2 right-2"
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <img
+                          src={imageUrl}
+                          alt="Preview"
+                          className="w-full max-w-md mx-auto rounded-lg shadow-soft"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setImageUrl("")}
+                          className="absolute top-2 right-2"
+                        >
+                          Change
+                        </Button>
+                      </div>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setImageUrls([]);
+                        setImageFiles([]);
+                        setImageUrl("");
+                      }}
+                      className="w-full rounded-xl"
+                    >
+                      Clear All & Upload New
+                    </Button>
                   </div>
                 )}
               </div>
@@ -368,10 +417,10 @@ const CreatePin = () => {
               <div className="flex gap-4">
                 <Button 
                   type="submit" 
-                  disabled={loading || isUploading || !imageUrl || !title || !selectedBoard}
+                  disabled={loading || isUploading || (imageUrls.length === 0 && !imageUrl) || !title || !selectedBoard}
                   className="flex-1 rounded-xl"
                 >
-                  {loading ? "Creating..." : "Create Pin"}
+                  {loading ? "Creating..." : imageUrls.length > 1 ? `Create ${imageUrls.length} Pins` : "Create Pin"}
                 </Button>
                 <Button 
                   type="button" 
